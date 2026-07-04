@@ -1,0 +1,94 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  color-scheme: light;
+  --background: #fff3f1;
+  --foreground: #1d1d1d;
+  --surface: #ffffff;
+  --surface-muted: #fde8e6;
+  --accent: #d60f0f;
+  --accent-soft: #ffe4e2;
+}
+
+.dark {
+  color-scheme: dark;
+  --background: #130909;
+  --foreground: #f7eceb;
+  --surface: #1f1212;
+  --surface-muted: #3a0f0f;
+  --accent: #ff6565;
+  --accent-soft: #4a0808;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+html {
+  background: var(--background);
+  overflow-x: hidden;
+}
+
+body {
+  min-height: 100vh;
+  overflow-x: hidden;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  transition:
+    background-color 200ms ease,
+    color 200ms ease;
+}
+
+.line-clamp-1,
+.line-clamp-2,
+.line-clamp-3 {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+}
+
+.line-clamp-1 {
+  -webkit-line-clamp: 1;
+}
+
+.line-clamp-2 {
+  -webkit-line-clamp: 2;
+}
+
+.line-clamp-3 {
+  -webkit-line-clamp: 3;
+}
+
+@keyframes product-card-price-value-in {
+  from {
+    opacity: 0;
+    filter: blur(1px);
+    transform: rotateX(-76deg) translateY(0.35rem) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: rotateX(0deg) translateY(0) scale(1);
+  }
+}
+
+@keyframes product-card-price-button-in {
+  from {
+    opacity: 0;
+    filter: blur(1px);
+    transform: rotateX(-86deg) translateY(0.5rem) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: rotateX(0deg) translateY(0) scale(1);
+  }
+}
