@@ -22,6 +22,7 @@ import {
   staggerContainerVariants,
   viewportOnce,
 } from "@/src/components/ui/motion";
+import { trackEvent } from "@/src/lib/tracking";
 import { cn, formatVND } from "@/src/lib/utils";
 import productService, { type Product } from "@/src/services/product.service";
 import { useCartStore } from "@/src/store/useCartStore";
@@ -129,6 +130,11 @@ export default function ProductDetailPage() {
       quantity: 1,
       imageUrl: typeof imageSrc === "string" ? imageSrc : undefined,
     });
+    trackEvent("ADD_TO_CART", {
+      productId: product.id,
+      productName: product.name,
+      price: product.price ?? null,
+    });
 
     setAddedMessage("Đã thêm sản phẩm vào giỏ hàng.");
     window.setTimeout(() => setAddedMessage(""), 2200);
@@ -206,12 +212,51 @@ export default function ProductDetailPage() {
 
   const categoryName = product.category?.name;
   const brandName = product.brand?.name;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://hoanglong.vn";
+  const productUrl = `${siteUrl}/products/${product.id}`;
+  const productImageForSeo =
+    typeof imageSrc === "string" && imageSrc.startsWith("http")
+      ? imageSrc
+      : typeof imageSrc === "string" && imageSrc.startsWith("/")
+        ? `${siteUrl}${imageSrc}`
+        : `${siteUrl}${typeof imageSrc === "string" ? logoImg.src : imageSrc.src}`;
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    description:
+      product.description ??
+      "Phụ tùng xe máy, dầu nhớt và vật tư bảo dưỡng tại Hoàng Long.",
+    image: productImageForSeo,
+    url: productUrl,
+    brand: brandName
+      ? {
+          "@type": "Brand",
+          name: brandName,
+        }
+      : undefined,
+    category: categoryName,
+    offers: {
+      "@type": "Offer",
+      url: productUrl,
+      priceCurrency: "VND",
+      price: product.price ?? undefined,
+      availability: product.isActive
+        ? "https://schema.org/InStock"
+        : "https://schema.org/OutOfStock",
+      itemCondition: "https://schema.org/NewCondition",
+    },
+  };
 
   return (
     <motion.div
       {...pageFadeIn}
       className="min-h-screen bg-[linear-gradient(180deg,rgba(251,191,36,0.14),rgba(255,255,255,0))] text-foreground"
     >
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
       <motion.section
         initial="hidden"
         animate="visible"

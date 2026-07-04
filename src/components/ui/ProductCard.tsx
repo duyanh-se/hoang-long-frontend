@@ -1,15 +1,14 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, type HTMLMotionProps } from "framer-motion";
 import Image, { type StaticImageData } from "next/image";
-import { type ComponentPropsWithoutRef } from "react";
 import logoImg from "@/src/assets/images/Logo_Hoang_Long.jpg";
 import { cn, formatVND } from "@/src/lib/utils";
 import type { Product } from "@/src/services/product.service";
 import { ButtonLink } from "./Button";
 import { fadeUpVariants, viewportOnce } from "./motion";
 
-export type ProductCardProps = ComponentPropsWithoutRef<"article"> & {
+export type ProductCardProps = HTMLMotionProps<"article"> & {
   product: Product;
 };
 
