@@ -3,8 +3,11 @@ import type {
   TrackingEventType,
   TrackingPayload,
 } from "../services/tracking.service";
+import { AxiosError } from "axios";
 
 const sessionStorageKey = "hoang-long-visitor-session-id";
+let trackingDisabledForMissingEndpoint = false;
+let trackingMissingEndpointWarned = false;
 
 function getSessionId() {
   if (typeof window === "undefined") {
@@ -29,7 +32,8 @@ export function trackEvent(
 ) {
   if (
     typeof window === "undefined" ||
-    process.env.NEXT_PUBLIC_ENABLE_TRACKING === "false"
+    process.env.NEXT_PUBLIC_ENABLE_TRACKING === "false" ||
+    trackingDisabledForMissingEndpoint
   ) {
     return;
   }
@@ -49,6 +53,25 @@ export function trackEvent(
       payload,
     })
     .catch((error: unknown) => {
+      const status =
+        error instanceof AxiosError ? error.response?.status : undefined;
+
+      if (status === 404) {
+        trackingDisabledForMissingEndpoint = true;
+
+        if (
+          process.env.NODE_ENV !== "production" &&
+          !trackingMissingEndpointWarned
+        ) {
+          trackingMissingEndpointWarned = true;
+          console.warn(
+            "Tracking API endpoint is missing. Tracking is disabled for this session.",
+          );
+        }
+
+        return;
+      }
+
       if (process.env.NODE_ENV !== "production") {
         console.warn("Tracking event failed", error);
       }

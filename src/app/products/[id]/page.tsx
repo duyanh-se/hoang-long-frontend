@@ -261,7 +261,7 @@ export default function ProductDetailPage() {
         initial="hidden"
         animate="visible"
         variants={staggerContainerVariants}
-        className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8"
+        className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8"
       >
         <motion.div variants={fadeUpVariants}>
           <Link
@@ -275,11 +275,11 @@ export default function ProductDetailPage() {
 
         <motion.div
           variants={scaleInVariants}
-          className="mt-6 grid gap-8 rounded-4xl border border-red-100 bg-white/90 p-5 shadow-[0_24px_80px_rgba(127,29,29,0.08)] backdrop-blur dark:border-red-800 dark:bg-red-950/70 lg:grid-cols-[1fr_0.95fr] lg:p-8"
+          className="mt-5 grid gap-6 rounded-3xl border border-red-100 bg-white/90 p-4 shadow-[0_24px_80px_rgba(127,29,29,0.08)] backdrop-blur dark:border-red-800 dark:bg-red-950/70 sm:mt-6 sm:rounded-4xl sm:p-5 lg:grid-cols-[1fr_0.95fr] lg:gap-8 lg:p-8"
         >
           <motion.div
             variants={fadeUpVariants}
-            className="relative aspect-square overflow-hidden rounded-4xl bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.95),rgba(254,226,226,0.92),rgba(248,113,113,0.22))] dark:bg-[radial-gradient(circle_at_30%_20%,rgba(127,29,29,0.5),rgba(69,10,10,0.85),rgba(20,8,8,1))]"
+            className="relative aspect-square overflow-hidden rounded-3xl bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.95),rgba(254,226,226,0.92),rgba(248,113,113,0.22))] dark:bg-[radial-gradient(circle_at_30%_20%,rgba(127,29,29,0.5),rgba(69,10,10,0.85),rgba(20,8,8,1))] sm:rounded-4xl"
             whileHover={{ scale: 1.015 }}
             transition={{ duration: 0.35, ease: "easeOut" }}
           >
@@ -323,20 +323,20 @@ export default function ProductDetailPage() {
               </span>
             </div>
 
-            <h1 className="mt-5 text-4xl font-semibold tracking-tight text-zinc-950 dark:text-white sm:text-5xl">
+            <h1 className="mt-4 text-3xl font-semibold tracking-tight text-zinc-950 dark:text-white sm:mt-5 sm:text-5xl">
               {product.name}
             </h1>
 
-            <p className="mt-4 text-base leading-8 text-zinc-600 dark:text-zinc-300">
+            <p className="mt-4 text-sm leading-7 text-zinc-600 dark:text-zinc-300 sm:text-base sm:leading-8">
               {product.description ??
                 "Liên hệ Hoàng Long để được tư vấn cấu hình và báo giá phù hợp."}
             </p>
 
-            <div className="mt-6 rounded-4xl border border-red-100 bg-red-50/80 p-5 dark:border-red-800 dark:bg-red-950/50">
+            <div className="mt-5 rounded-3xl border border-red-100 bg-red-50/80 p-4 dark:border-red-800 dark:bg-red-950/50 sm:mt-6 sm:rounded-4xl sm:p-5">
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-red-500 dark:text-red-300">
                 Giá bán
               </p>
-              <p className="mt-2 text-3xl font-bold text-red-700 dark:text-red-200">
+              <p className="mt-2 text-2xl font-bold text-red-700 dark:text-red-200 sm:text-3xl">
                 {product.price != null
                   ? formatVND(product.price)
                   : "Liên hệ để biết giá"}
@@ -348,12 +348,16 @@ export default function ProductDetailPage() {
                 type="button"
                 onClick={handleAddToCart}
                 disabled={!product.isActive}
-                className="h-12 border-red-600 bg-red-600 text-white hover:bg-red-700 dark:border-red-500 dark:bg-red-500 dark:hover:bg-red-400"
+                className="h-12 w-full border-red-600 bg-red-600 text-white hover:bg-red-700 dark:border-red-500 dark:bg-red-500 dark:hover:bg-red-400"
               >
                 <ShoppingCart className="mr-2 h-5 w-5" />
                 Thêm vào giỏ hàng
               </Button>
-              <ButtonLink href="/#tu-van" variant="neutral" className="h-12">
+              <ButtonLink
+                href="/#tu-van"
+                variant="neutral"
+                className="h-12 w-full"
+              >
                 <MessageCircle className="mr-2 h-5 w-5" />
                 Liên hệ tư vấn
               </ButtonLink>
@@ -393,9 +397,9 @@ export default function ProductDetailPage() {
             whileInView="visible"
             viewport={viewportOnce}
             variants={fadeUpVariants}
-            className="mt-8 rounded-4xl border border-red-100 bg-white/90 p-6 shadow-lg shadow-red-950/5 dark:border-red-800 dark:bg-red-950/60 sm:p-8"
+            className="mt-6 rounded-3xl border border-red-100 bg-white/90 p-5 shadow-lg shadow-red-950/5 dark:border-red-800 dark:bg-red-950/60 sm:mt-8 sm:rounded-4xl sm:p-8"
           >
-            <h2 className="text-2xl font-semibold text-zinc-950 dark:text-white">
+            <h2 className="text-xl font-semibold text-zinc-950 dark:text-white sm:text-2xl">
               Thông số sản phẩm
             </h2>
             <motion.div

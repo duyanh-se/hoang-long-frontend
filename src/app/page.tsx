@@ -136,17 +136,17 @@ export default function Home() {
         whileInView="visible"
         viewport={viewportOnce}
         variants={fadeUpVariants}
-        className="mx-auto w-full max-w-7xl px-4 py-20 sm:px-6 lg:px-8"
+        className="mx-auto w-full max-w-7xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8"
       >
         <motion.div
           variants={scaleInVariants}
           className="overflow-hidden rounded-[2rem] border border-red-100 bg-white/85 shadow-xl shadow-red-950/5 backdrop-blur dark:border-red-800 dark:bg-red-950/45"
         >
           <div className="grid gap-0 lg:grid-cols-[0.95fr_1.05fr] lg:items-stretch">
-            <div className="relative min-h-[320px] border-b border-red-100 bg-red-50/70 dark:border-red-800 dark:bg-red-950/60 lg:min-h-full lg:border-b-0 lg:border-r">
+            <div className="relative min-h-[240px] border-b border-red-100 bg-red-50/70 dark:border-red-800 dark:bg-red-950/60 sm:min-h-[320px] lg:min-h-full lg:border-b-0 lg:border-r">
               <div className="absolute inset-0 bg-gradient-to-br from-red-100/70 via-transparent to-amber-100/40 dark:from-red-900/30 dark:to-red-950/20" />
-              <div className="relative flex h-full items-center justify-center p-6 sm:p-8">
-                <div className="relative aspect-[4/3] w-full max-w-lg overflow-hidden rounded-[1.75rem] border border-red-100 bg-white shadow-2xl shadow-red-950/10 dark:border-red-800 dark:bg-red-950/60">
+              <div className="relative flex h-full items-center justify-center p-4 sm:p-8">
+                <div className="relative aspect-[4/3] w-full max-w-lg overflow-hidden rounded-[1.5rem] border border-red-100 bg-white shadow-2xl shadow-red-950/10 dark:border-red-800 dark:bg-red-950/60 sm:rounded-[1.75rem]">
                   <Image
                     src={logoCuaHang}
                     alt="Hình ảnh logo cửa hàng phụ tùng xe máy Hoàng Long"
@@ -159,15 +159,15 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="p-6 sm:p-8 lg:p-10">
-              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-red-600 dark:text-red-400">
+            <div className="p-5 sm:p-8 lg:p-10">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-red-600 dark:text-red-400 sm:text-sm sm:tracking-[0.24em]">
                 Giới thiệu
               </p>
-              <h2 className="mt-4 text-3xl font-semibold tracking-tight text-zinc-950 dark:text-white sm:text-4xl">
+              <h2 className="mt-3 text-2xl font-semibold tracking-tight text-zinc-950 dark:text-white sm:mt-4 sm:text-4xl">
                 Cửa hàng phụ tùng xe máy, dầu nhớt và vật tư bảo dưỡng chính
                 hãng.
               </h2>
-              <p className="mt-5 text-lg leading-8 text-zinc-700 dark:text-zinc-300">
+              <p className="mt-4 text-base leading-7 text-zinc-700 dark:text-zinc-300 sm:mt-5 sm:text-lg sm:leading-8">
                 Hoàng Long cung cấp phụ tùng, dầu nhớt và phụ kiện bảo dưỡng cho
                 khách lẻ, gara và cửa hàng. Sản phẩm được trình bày rõ ảnh, giá
                 và thông tin tư vấn để khách dễ chọn đúng mã hàng.
@@ -178,18 +178,18 @@ export default function Home() {
                 whileInView="visible"
                 viewport={viewportOnce}
                 variants={staggerContainerVariants}
-                className="mt-8 grid gap-3 sm:grid-cols-3"
+                className="mt-6 grid gap-3 sm:mt-8 sm:grid-cols-3"
               >
                 {trustItems.map((item) => (
                   <motion.div
                     key={item.label}
                     variants={scaleInVariants}
-                    className="rounded-3xl border border-red-100 bg-red-50/80 p-4 shadow-sm dark:border-red-800 dark:bg-red-950/70"
+                    className="rounded-3xl border border-red-100 bg-red-50/80 p-3 shadow-sm dark:border-red-800 dark:bg-red-950/70 sm:p-4"
                   >
-                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-red-500 dark:text-red-300">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-red-500 dark:text-red-300 sm:text-xs sm:tracking-[0.2em]">
                       {item.label}
                     </p>
-                    <p className="mt-2 text-2xl font-bold text-red-800 dark:text-red-100">
+                    <p className="mt-2 text-xl font-bold text-red-800 dark:text-red-100 sm:text-2xl">
                       {item.value}
                     </p>
                     <p className="mt-1 text-xs leading-5 text-zinc-500 dark:text-zinc-400">
@@ -204,7 +204,7 @@ export default function Home() {
                 whileInView="visible"
                 viewport={viewportOnce}
                 variants={staggerContainerVariants}
-                className="mt-8 grid gap-3 sm:grid-cols-2"
+                className="mt-6 grid gap-3 sm:mt-8 sm:grid-cols-2"
               >
                 {[
                   "Tư vấn đúng mã phụ tùng theo dòng xe",
@@ -231,18 +231,18 @@ export default function Home() {
         whileInView="visible"
         viewport={viewportOnce}
         variants={fadeUpVariants}
-        className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:px-8"
+        className="mx-auto w-full max-w-7xl px-4 py-14 sm:px-6 sm:py-16 lg:px-8"
       >
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-red-600 dark:text-red-400">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-red-600 dark:text-red-400 sm:text-sm sm:tracking-[0.24em]">
               Sản phẩm
             </p>
-            <h2 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
+            <h2 className="mt-3 text-2xl font-semibold tracking-tight sm:mt-4 sm:text-4xl">
               Sản phẩm nổi bật, dễ chọn và dễ đặt hàng.
             </h2>
           </div>
-          <p className="max-w-xl text-base leading-7 text-zinc-600 dark:text-zinc-300">
+          <p className="max-w-xl text-sm leading-6 text-zinc-600 dark:text-zinc-300 sm:text-base sm:leading-7">
             Chọn nhanh nhóm hàng phù hợp hoặc xem trực tiếp các sản phẩm đang
             được nhiều khách quan tâm.
           </p>
@@ -253,7 +253,7 @@ export default function Home() {
           whileInView="visible"
           viewport={viewportOnce}
           variants={staggerContainerVariants}
-          className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
+          className="mt-6 grid grid-cols-1 gap-3 sm:mt-8 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4"
         >
           {quickCategories.map(({ title, description, icon: CategoryIcon }) => (
             <motion.div
@@ -264,7 +264,7 @@ export default function Home() {
             >
               <Link
                 href="/products"
-                className="group block h-full rounded-4xl border border-red-100 bg-white/90 p-5 shadow-sm transition-all duration-300 hover:border-red-200 hover:shadow-xl hover:shadow-red-950/10 dark:border-red-800 dark:bg-red-950/60 dark:hover:border-red-600"
+                className="group block h-full rounded-3xl border border-red-100 bg-white/90 p-4 shadow-sm transition-all duration-300 hover:border-red-200 hover:shadow-xl hover:shadow-red-950/10 dark:border-red-800 dark:bg-red-950/60 dark:hover:border-red-600 sm:rounded-4xl sm:p-5"
               >
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-red-600 text-white shadow-lg shadow-red-950/15 transition group-hover:scale-105 dark:bg-red-500">
                   <CategoryIcon className="h-5 w-5" />
@@ -285,7 +285,7 @@ export default function Home() {
           whileInView="visible"
           viewport={viewportOnce}
           variants={fadeUpVariants}
-          className="mt-6 rounded-4xl border border-red-100 bg-white/80 p-5 shadow-sm dark:border-red-800 dark:bg-red-950/50"
+          className="mt-5 rounded-3xl border border-red-100 bg-white/80 p-4 shadow-sm dark:border-red-800 dark:bg-red-950/50 sm:mt-6 sm:rounded-4xl sm:p-5"
         >
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
@@ -301,7 +301,7 @@ export default function Home() {
 
             <ButtonLink
               href="/products"
-              className="border-red-600 bg-red-600 text-white shadow-lg shadow-red-950/15 hover:bg-red-700 dark:border-red-500 dark:bg-red-500 dark:hover:bg-red-400"
+              className="w-full border-red-600 bg-red-600 text-white shadow-lg shadow-red-950/15 hover:bg-red-700 dark:border-red-500 dark:bg-red-500 dark:hover:bg-red-400 sm:w-auto"
             >
               Xem tất cả sản phẩm
             </ButtonLink>
@@ -313,18 +313,18 @@ export default function Home() {
           whileInView="visible"
           viewport={viewportOnce}
           variants={staggerContainerVariants}
-          className="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-4"
+          className="mt-6 grid grid-cols-2 gap-3 sm:mt-8 sm:gap-5 xl:grid-cols-4"
         >
           {isLoading ? (
-            <div className="col-span-full rounded-4xl border border-red-100 bg-red-50/90 p-8 text-center text-zinc-700 shadow-lg shadow-red-950/5 dark:border-red-700 dark:bg-red-950/70 dark:text-zinc-200">
+            <div className="col-span-full rounded-3xl border border-red-100 bg-red-50/90 p-6 text-center text-zinc-700 shadow-lg shadow-red-950/5 dark:border-red-700 dark:bg-red-950/70 dark:text-zinc-200 sm:rounded-4xl sm:p-8">
               Đang tải sản phẩm...
             </div>
           ) : error ? (
-            <div className="col-span-full rounded-4xl border border-red-200 bg-red-50/90 p-8 text-center text-red-700 shadow-lg shadow-red-950/5 dark:border-red-700 dark:bg-red-950/70 dark:text-red-300">
+            <div className="col-span-full rounded-3xl border border-red-200 bg-red-50/90 p-6 text-center text-red-700 shadow-lg shadow-red-950/5 dark:border-red-700 dark:bg-red-950/70 dark:text-red-300 sm:rounded-4xl sm:p-8">
               {error}
             </div>
           ) : featuredProducts.length === 0 ? (
-            <div className="col-span-full rounded-4xl border border-red-100 bg-red-50/90 p-8 text-center text-zinc-700 shadow-lg shadow-red-950/5 dark:border-red-700 dark:bg-red-950/70 dark:text-zinc-200">
+            <div className="col-span-full rounded-3xl border border-red-100 bg-red-50/90 p-6 text-center text-zinc-700 shadow-lg shadow-red-950/5 dark:border-red-700 dark:bg-red-950/70 dark:text-zinc-200 sm:rounded-4xl sm:p-8">
               Chưa có sản phẩm nổi bật để hiển thị.
             </div>
           ) : (
@@ -353,18 +353,18 @@ export default function Home() {
         whileInView="visible"
         viewport={viewportOnce}
         variants={fadeUpVariants}
-        className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:px-8"
+        className="mx-auto w-full max-w-7xl px-4 py-14 sm:px-6 sm:py-16 lg:px-8"
       >
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-red-600 dark:text-red-400">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-red-600 dark:text-red-400 sm:text-sm sm:tracking-[0.24em]">
               Khách hàng tin chọn
             </p>
-            <h2 className="mt-4 max-w-3xl text-3xl font-semibold tracking-tight sm:text-4xl">
+            <h2 className="mt-3 max-w-3xl text-2xl font-semibold tracking-tight sm:mt-4 sm:text-4xl">
               Phù hợp cho khách lẻ, thợ sửa xe và gara cần nguồn hàng ổn định.
             </h2>
           </div>
-          <p className="max-w-xl text-base leading-7 text-zinc-600 dark:text-zinc-300">
+          <p className="max-w-xl text-sm leading-6 text-zinc-600 dark:text-zinc-300 sm:text-base sm:leading-7">
             Tập trung vào tư vấn đúng mã hàng, giá rõ ràng và hỗ trợ đặt hàng
             nhanh để khách dễ quyết định.
           </p>
@@ -375,7 +375,7 @@ export default function Home() {
           whileInView="visible"
           viewport={viewportOnce}
           variants={staggerContainerVariants}
-          className="mt-8 grid gap-5 md:grid-cols-3"
+          className="mt-6 grid gap-4 sm:mt-8 md:grid-cols-3 md:gap-5"
         >
           {customerProof.map((item) => (
             <motion.article
@@ -383,7 +383,7 @@ export default function Home() {
               variants={scaleInVariants}
               whileHover={{ y: -6 }}
               transition={{ duration: 0.22, ease: "easeOut" }}
-              className="rounded-4xl border border-red-100 bg-white/90 p-6 shadow-lg shadow-red-950/5 dark:border-red-800 dark:bg-red-950/60"
+              className="rounded-3xl border border-red-100 bg-white/90 p-5 shadow-lg shadow-red-950/5 dark:border-red-800 dark:bg-red-950/60 sm:rounded-4xl sm:p-6"
             >
               <div className="flex gap-1 text-amber-400">
                 {Array.from({ length: 5 }).map((_, index) => (
@@ -412,18 +412,18 @@ export default function Home() {
         whileInView="visible"
         viewport={viewportOnce}
         variants={fadeUpVariants}
-        className="mx-auto w-full max-w-7xl px-4 py-20 sm:px-6 lg:px-8"
+        className="mx-auto w-full max-w-7xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8"
       >
         <motion.div
           variants={scaleInVariants}
-          className="rounded-4xl border border-red-700 bg-red-950 p-8 text-white shadow-[0_30px_80px_rgba(146,21,21,0.22)]"
+          className="rounded-3xl border border-red-700 bg-red-950 p-5 text-white shadow-[0_30px_80px_rgba(146,21,21,0.22)] sm:rounded-4xl sm:p-8"
         >
           <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-amber-300">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-300 sm:text-sm sm:tracking-[0.24em]">
                 Tư vấn
               </p>
-              <h2 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
+              <h2 className="mt-3 text-2xl font-semibold tracking-tight sm:mt-4 sm:text-4xl">
                 Gửi dòng xe, nhận đúng mã phụ tùng và báo giá nhanh.
               </h2>
               <p className="mt-4 max-w-2xl text-sm leading-7 text-white/75">
@@ -436,6 +436,7 @@ export default function Home() {
                   href="mailto:info@hoanglong.vn"
                   variant="inverse"
                   size="lg"
+                  className="w-full sm:w-auto"
                 >
                   <MessageCircle className="mr-2 h-4 w-4" />
                   Nhận báo giá ngay
@@ -443,7 +444,7 @@ export default function Home() {
                 <ButtonLink
                   href="tel:0945523790"
                   size="lg"
-                  className="border-white/20 bg-white/10 text-white hover:bg-white/15"
+                  className="w-full border-white/20 bg-white/10 text-white hover:bg-white/15 sm:w-auto"
                 >
                   <PhoneCall className="mr-2 h-4 w-4" />
                   Gọi 0945 523 790

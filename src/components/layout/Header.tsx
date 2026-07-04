@@ -214,7 +214,7 @@ export default function Header() {
         aria-label="Đóng giỏ hàng"
       />
       <motion.aside
-        className="absolute right-0 top-0 flex h-dvh w-full max-w-md flex-col border-l border-black/10 bg-background shadow-2xl dark:border-white/10"
+        className="absolute right-0 top-0 flex h-dvh w-full max-w-[min(100vw,28rem)] flex-col border-l border-black/10 bg-background shadow-2xl dark:border-white/10"
         initial={{ x: "100%" }}
         animate={{ x: 0 }}
         exit={{ x: "100%" }}
@@ -224,7 +224,7 @@ export default function Header() {
         aria-modal="true"
         aria-label="Giỏ hàng"
       >
-        <div className="flex items-center justify-between border-b border-black/10 px-5 py-4 dark:border-white/10">
+        <div className="flex items-center justify-between border-b border-black/10 px-4 py-3 dark:border-white/10 sm:px-5 sm:py-4">
           <div>
             <p className="text-xs uppercase tracking-[0.24em] text-zinc-500 dark:text-zinc-400">
               Cart
@@ -242,7 +242,7 @@ export default function Header() {
           </Button>
         </div>
 
-        <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-5">
+        <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-4 sm:p-5">
           {visibleCartItems.length === 0 ? (
             <div className="rounded-3xl border border-dashed border-black/15 bg-white p-5 text-sm text-zinc-600 dark:border-white/10 dark:bg-white/5 dark:text-zinc-300">
               Giỏ hàng đang trống. Hãy thêm sản phẩm từ trang chi tiết.
@@ -255,11 +255,11 @@ export default function Header() {
                   initial={{ opacity: 0, x: 18 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.28, ease: "easeOut" }}
-                  className="rounded-3xl border border-red-100 bg-white p-4 shadow-sm dark:border-red-800 dark:bg-red-950/70"
+                  className="rounded-3xl border border-red-100 bg-white p-3 shadow-sm dark:border-red-800 dark:bg-red-950/70 sm:p-4"
                 >
                   <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="font-semibold text-zinc-950 dark:text-white">
+                    <div className="min-w-0">
+                      <p className="line-clamp-2 font-semibold text-zinc-950 dark:text-white">
                         {item.name}
                       </p>
                       <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
@@ -287,10 +287,12 @@ export default function Header() {
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.32, ease: "easeOut" }}
-            className="rounded-3xl bg-[linear-gradient(135deg,rgba(251,191,36,1),rgba(249,115,22,1))] p-5 text-zinc-950 dark:bg-[linear-gradient(135deg,rgba(58,54,54,1),rgba(17,17,17,1))] dark:text-zinc-50"
+            className="rounded-3xl bg-[linear-gradient(135deg,rgba(251,191,36,1),rgba(249,115,22,1))] p-4 text-zinc-950 dark:bg-[linear-gradient(135deg,rgba(58,54,54,1),rgba(17,17,17,1))] dark:text-zinc-50 sm:p-5"
           >
             <p className="text-sm font-medium">Số lượng sản phẩm</p>
-            <p className="mt-2 text-4xl font-semibold">{cartCount}</p>
+            <p className="mt-2 text-3xl font-semibold sm:text-4xl">
+              {cartCount}
+            </p>
             <p className="mt-3 text-sm font-semibold">
               Tạm tính: {formatVND(cartTotal)}
             </p>
@@ -439,13 +441,13 @@ export default function Header() {
           transition={{ duration: 0.28, ease: "easeOut" }}
           className="border-b border-black/10 bg-background/95 backdrop-blur-xl will-change-transform dark:border-white/10"
         >
-          <div className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-3 px-4 sm:h-20 sm:gap-4 sm:px-6 lg:px-8">
             <Link
               href="/"
-              className="flex items-center gap-3 text-sm font-semibold tracking-[0.22em] text-foreground"
+              className="flex min-w-0 items-center gap-2 text-sm font-semibold tracking-[0.16em] text-foreground sm:gap-3 sm:tracking-[0.22em]"
               aria-label="Hoàng Long Motorbike Parts"
             >
-              <div className="relative h-11 w-11 overflow-hidden rounded-2xl border border-red-200 bg-red-50 shadow-[0_10px_30px_rgba(210,11,11,0.18)] dark:border-red-700 dark:bg-red-950">
+              <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-2xl border border-red-200 bg-red-50 shadow-[0_10px_30px_rgba(210,11,11,0.18)] dark:border-red-700 dark:bg-red-950 sm:h-11 sm:w-11">
                 <Image
                   src={logoImg}
                   alt="Hoàng Long logo"
@@ -454,7 +456,7 @@ export default function Header() {
                   sizes="44px"
                 />
               </div>
-              <span className="hidden text-base tracking-[0.18em] text-red-900 sm:inline-flex dark:text-red-300">
+              <span className="hidden truncate text-base tracking-[0.18em] text-red-900 sm:inline-flex dark:text-red-300">
                 Hoàng Long
               </span>
             </Link>
@@ -471,11 +473,12 @@ export default function Header() {
               ))}
             </nav>
 
-            <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex shrink-0 items-center gap-1.5 sm:gap-3">
               <Button
                 type="button"
                 onClick={handleThemeToggle}
                 size="icon"
+                className="h-10 w-10 sm:h-11 sm:w-11"
                 aria-label={
                   theme === "dark"
                     ? "Chuyển sang light mode"
@@ -489,7 +492,7 @@ export default function Header() {
                 type="button"
                 onClick={openCartDrawer}
                 size="icon"
-                className="relative"
+                className="relative h-10 w-10 sm:h-11 sm:w-11"
                 aria-label="Mở giỏ hàng"
               >
                 <ShoppingCart className="h-5 w-5" />
@@ -503,7 +506,7 @@ export default function Header() {
                 onClick={() => setMobileMenuOpen((current) => !current)}
                 variant="neutral"
                 size="icon"
-                className="lg:hidden"
+                className="h-10 w-10 lg:hidden sm:h-11 sm:w-11"
                 aria-label={mobileMenuOpen ? "Đóng menu" : "Mở menu"}
                 aria-expanded={mobileMenuOpen}
               >
@@ -529,7 +532,7 @@ export default function Header() {
                 transition={{ duration: 0.28, ease: "easeOut" }}
                 className="overflow-hidden border-t border-black/10 bg-background/95 dark:border-white/10 lg:hidden"
               >
-                <nav className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-4 sm:px-6 lg:px-8">
+                <nav className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-3 sm:px-6 sm:py-4 lg:px-8">
                   {navigationItems.map((item, index) => (
                     <motion.div
                       key={item.id}

@@ -130,22 +130,22 @@ export default function ProductsPage() {
         initial="hidden"
         animate="visible"
         variants={fadeUpVariants}
-        className="mx-auto w-full max-w-7xl px-4 py-12 sm:px-6 lg:px-8"
+        className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8"
       >
         <motion.div
           variants={scaleInVariants}
-          className="rounded-4xl border border-red-100 bg-white/80 p-6 shadow-lg shadow-red-950/5 backdrop-blur dark:border-red-800 dark:bg-red-950/50 sm:p-8"
+          className="rounded-3xl border border-red-100 bg-white/80 p-5 shadow-lg shadow-red-950/5 backdrop-blur dark:border-red-800 dark:bg-red-950/50 sm:rounded-4xl sm:p-8"
         >
           <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-red-600 dark:text-red-300">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-red-600 dark:text-red-300 sm:text-sm sm:tracking-[0.24em]">
                 Danh mục sản phẩm
               </p>
-              <h1 className="mt-4 text-4xl font-semibold tracking-tight text-zinc-950 dark:text-white sm:text-5xl">
+              <h1 className="mt-3 text-3xl font-semibold tracking-tight text-zinc-950 dark:text-white sm:mt-4 sm:text-5xl">
                 Tìm phụ tùng, dầu nhớt và vật tư bảo dưỡng theo đúng nhu cầu.
               </h1>
             </div>
-            <p className="text-base leading-8 text-zinc-600 dark:text-zinc-300">
+            <p className="text-sm leading-6 text-zinc-600 dark:text-zinc-300 sm:text-base sm:leading-8">
               Lọc nhanh theo danh mục, thương hiệu và nhóm sản phẩm để tìm đúng
               phụ tùng, dầu nhớt hoặc vật tư bảo dưỡng cần mua.
             </p>
@@ -157,12 +157,12 @@ export default function ProductsPage() {
         initial="hidden"
         animate="visible"
         variants={staggerContainerVariants}
-        className="mx-auto w-full max-w-7xl px-4 pb-20 sm:px-6 lg:px-8"
+        className="mx-auto w-full max-w-7xl px-4 pb-14 sm:px-6 sm:pb-20 lg:px-8"
       >
         <div className="grid gap-6 lg:grid-cols-[320px_1fr] lg:items-start">
           <motion.aside
             variants={fadeUpVariants}
-            className="rounded-4xl border border-red-100 bg-white/90 p-5 shadow-sm dark:border-red-800 dark:bg-red-950/60 lg:sticky lg:top-24"
+            className="rounded-3xl border border-red-100 bg-white/90 p-4 shadow-sm dark:border-red-800 dark:bg-red-950/60 sm:rounded-4xl sm:p-5 lg:sticky lg:top-24"
           >
             <div className="flex items-center justify-between gap-3">
               <div>
@@ -261,7 +261,7 @@ export default function ProductsPage() {
           <motion.div variants={fadeUpVariants}>
             <motion.div
               variants={scaleInVariants}
-              className="flex flex-col gap-3 rounded-4xl border border-red-100 bg-white/80 p-5 shadow-sm dark:border-red-800 dark:bg-red-950/50 sm:flex-row sm:items-center sm:justify-between"
+              className="flex flex-col gap-2 rounded-3xl border border-red-100 bg-white/80 p-4 shadow-sm dark:border-red-800 dark:bg-red-950/50 sm:flex-row sm:items-center sm:justify-between sm:rounded-4xl sm:p-5"
             >
               <div>
                 <p className="text-sm font-semibold text-zinc-950 dark:text-white">
@@ -278,26 +278,26 @@ export default function ProductsPage() {
               whileInView="visible"
               viewport={viewportOnce}
               variants={staggerContainerVariants}
-              className="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3"
+              className="mt-5 grid grid-cols-2 gap-3 sm:mt-6 sm:gap-5 md:grid-cols-2 xl:grid-cols-3"
             >
               {isLoading ? (
                 <motion.div
                   variants={fadeUpVariants}
-                  className="col-span-full rounded-4xl border border-red-100 bg-red-50/90 p-8 text-center text-zinc-700 shadow-lg shadow-red-950/5 dark:border-red-700 dark:bg-red-950/70 dark:text-zinc-200"
+                  className="col-span-full rounded-3xl border border-red-100 bg-red-50/90 p-6 text-center text-zinc-700 shadow-lg shadow-red-950/5 dark:border-red-700 dark:bg-red-950/70 dark:text-zinc-200 sm:rounded-4xl sm:p-8"
                 >
                   Đang tải sản phẩm...
                 </motion.div>
               ) : error ? (
                 <motion.div
                   variants={fadeUpVariants}
-                  className="col-span-full rounded-4xl border border-red-200 bg-red-50/90 p-8 text-center text-red-700 shadow-lg shadow-red-950/5 dark:border-red-700 dark:bg-red-950/70 dark:text-red-300"
+                  className="col-span-full rounded-3xl border border-red-200 bg-red-50/90 p-6 text-center text-red-700 shadow-lg shadow-red-950/5 dark:border-red-700 dark:bg-red-950/70 dark:text-red-300 sm:rounded-4xl sm:p-8"
                 >
                   {error}
                 </motion.div>
               ) : products.length === 0 ? (
                 <motion.div
                   variants={fadeUpVariants}
-                  className="col-span-full rounded-4xl border border-red-100 bg-red-50/90 p-8 text-center text-zinc-700 shadow-lg shadow-red-950/5 dark:border-red-700 dark:bg-red-950/70 dark:text-zinc-200"
+                  className="col-span-full rounded-3xl border border-red-100 bg-red-50/90 p-6 text-center text-zinc-700 shadow-lg shadow-red-950/5 dark:border-red-700 dark:bg-red-950/70 dark:text-zinc-200 sm:rounded-4xl sm:p-8"
                 >
                   Không có sản phẩm phù hợp với bộ lọc hiện tại.
                 </motion.div>
@@ -313,7 +313,7 @@ export default function ProductsPage() {
               whileInView="visible"
               viewport={viewportOnce}
               variants={fadeUpVariants}
-              className="mt-8 rounded-4xl border border-red-100 bg-white/80 p-4 shadow-sm dark:border-red-800 dark:bg-red-950/50"
+              className="mt-6 rounded-3xl border border-red-100 bg-white/80 p-4 shadow-sm dark:border-red-800 dark:bg-red-950/50 sm:mt-8 sm:rounded-4xl"
             >
               <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <Button
@@ -323,6 +323,7 @@ export default function ProductsPage() {
                   onClick={() =>
                     setPage((currentPage) => Math.max(1, currentPage - 1))
                   }
+                  className="w-full lg:w-auto"
                 >
                   Trang trước
                 </Button>
@@ -369,7 +370,7 @@ export default function ProductsPage() {
                     ))}
                   </div>
 
-                  <div className="h-2 w-56 overflow-hidden rounded-full bg-red-100 dark:bg-red-950">
+                  <div className="h-2 w-full max-w-56 overflow-hidden rounded-full bg-red-100 dark:bg-red-950">
                     <div
                       className="h-full rounded-full bg-red-600 transition-all duration-300 dark:bg-red-400"
                       style={{ width: `${(page / totalPages) * 100}%` }}
@@ -386,6 +387,7 @@ export default function ProductsPage() {
                   variant="neutral"
                   disabled={!hasNextPage || isLoading}
                   onClick={() => setPage((currentPage) => currentPage + 1)}
+                  className="w-full lg:w-auto"
                 >
                   Trang sau
                 </Button>

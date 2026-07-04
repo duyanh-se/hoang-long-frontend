@@ -1,12 +1,7 @@
 "use client";
 
 import Image, { type StaticImageData } from "next/image";
-import {
-  AnimatePresence,
-  motion,
-  useScroll,
-  useTransform,
-} from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowRight,
   BadgePercent,
@@ -14,7 +9,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import storeImageOne from "@/src/assets/images/cua-hang-1.jpg";
 import storeImageTwo from "@/src/assets/images/cua-hang-2.jpg";
 import storeImageThree from "@/src/assets/images/cua-hang-3.jpg";
@@ -68,20 +63,8 @@ function getCircularIndex(index: number) {
 }
 
 export default function HeroSection() {
-  const sectionRef = useRef<HTMLElement | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const activeSlide = heroSlides[activeIndex];
-
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start start", "end start"],
-  });
-
-  const contentY = useTransform(scrollYProgress, [0, 1], [0, 90]);
-  const contentOpacity = useTransform(scrollYProgress, [0, 0.55], [1, 0.2]);
-  const slideInfoY = useTransform(scrollYProgress, [0, 1], [0, 120]);
-  const orbOneY = useTransform(scrollYProgress, [0, 1], [0, 220]);
-  const orbTwoY = useTransform(scrollYProgress, [0, 1], [0, -180]);
 
   useEffect(() => {
     const interval = window.setInterval(() => {
@@ -100,10 +83,7 @@ export default function HeroSection() {
   };
 
   return (
-    <section
-      ref={sectionRef}
-      className="relative isolate min-h-[calc(100vh-5rem)] overflow-hidden bg-red-950 text-white"
-    >
+    <section className="relative isolate min-h-180 overflow-hidden bg-red-950 text-white sm:min-h-[calc(100vh-5rem)]">
       <AnimatePresence mode="wait">
         <motion.div
           key={activeSlide.title}
@@ -124,8 +104,8 @@ export default function HeroSection() {
         </motion.div>
       </AnimatePresence>
 
-      <div className="absolute inset-0 -z-20 bg-gradient-to-r from-red-950/70 via-red-950/35 to-black/5" />
-      <div className="absolute inset-0 -z-20 bg-gradient-to-t from-black/35 via-transparent to-black/10" />
+      <div className="absolute inset-0 -z-20 bg-linear-to-r from-red-950/70 via-red-950/35 to-black/5" />
+      <div className="absolute inset-0 -z-20 bg-linear-to-t from-black/35 via-transparent to-black/10" />
       <div
         className="pointer-events-none absolute inset-0 -z-10 opacity-20"
         style={{
@@ -135,43 +115,34 @@ export default function HeroSection() {
         }}
       />
 
-      <motion.div
-        style={{ y: orbOneY }}
-        className="pointer-events-none absolute -left-16 top-16 h-36 w-36 rounded-full bg-red-400/30 blur-3xl"
-      />
-      <motion.div
-        style={{ y: orbTwoY }}
-        className="pointer-events-none absolute -right-12 top-44 h-44 w-44 rounded-full bg-amber-300/25 blur-3xl"
-      />
+      <div className="pointer-events-none absolute -left-16 top-16 h-36 w-36 rounded-full bg-red-400/30 blur-3xl" />
+      <div className="pointer-events-none absolute -right-12 top-44 h-44 w-44 rounded-full bg-amber-300/25 blur-3xl" />
 
-      <div className="mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-7xl items-center px-4 py-20 sm:px-6 lg:px-8 lg:py-24">
-        <motion.div
-          style={{ y: contentY, opacity: contentOpacity }}
-          className="max-w-4xl rounded-[2rem] border border-white/15 bg-black/25 p-6 pb-32 shadow-2xl shadow-black/15 backdrop-blur-[2px] sm:p-8 lg:pb-20"
-        >
+      <div className="mx-auto flex min-h-180 w-full max-w-7xl items-start px-4 pb-56 pt-16 sm:min-h-[calc(100vh-5rem)] sm:items-center sm:px-6 sm:py-20 lg:px-8 lg:py-24">
+        <motion.div className="max-w-4xl rounded-[1.75rem] border border-white/15 bg-black/30 p-5 shadow-2xl shadow-black/15 backdrop-blur-[2px] sm:rounded-4xl sm:p-8 lg:pb-20">
           <motion.div
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: "easeOut" }}
-            className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-white shadow-sm backdrop-blur"
+            className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-white shadow-sm backdrop-blur sm:px-4 sm:text-xs sm:tracking-[0.24em]"
           >
             <BadgePercent className="h-4 w-4 shrink-0" />
             Phụ tùng chính hãng cho khách lẻ & gara
           </motion.div>
 
-          <div className="mt-6 flex flex-col gap-5 sm:flex-row sm:items-center">
+          <div className="mt-5 flex flex-col gap-4 sm:mt-6 sm:flex-row sm:items-center sm:gap-5">
             <motion.div
               initial={{ opacity: 0, scale: 0.92, y: 18 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               transition={{ duration: 0.75, ease: "easeOut", delay: 0.06 }}
-              className="relative h-24 w-24 shrink-0 overflow-hidden rounded-[1.75rem] border border-white/30 bg-white p-1 shadow-2xl shadow-black/25 sm:h-28 sm:w-28 lg:h-32 lg:w-32"
+              className="relative h-20 w-20 shrink-0 overflow-hidden rounded-3xl border border-white/30 bg-white p-1 shadow-2xl shadow-black/25 sm:h-28 sm:w-28 sm:rounded-[1.75rem] lg:h-32 lg:w-32"
             >
               <Image
                 src={logoHoangLong}
                 alt="Logo phụ tùng xe máy Hoàng Long"
                 fill
-                className="rounded-[1.4rem] object-cover"
-                sizes="(min-width: 1024px) 128px, (min-width: 640px) 112px, 96px"
+                className="rounded-[1.2rem] object-cover sm:rounded-[1.4rem]"
+                sizes="(min-width: 1024px) 128px, (min-width: 640px) 112px, 80px"
                 priority
               />
             </motion.div>
@@ -180,7 +151,7 @@ export default function HeroSection() {
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, ease: "easeOut", delay: 0.08 }}
-              className="max-w-4xl text-4xl font-semibold tracking-tight text-white sm:text-5xl lg:text-7xl"
+              className="max-w-4xl text-3xl font-semibold tracking-tight text-white sm:text-5xl lg:text-7xl"
             >
               Phụ tùng xe máy chính hãng, có sẵn, giao nhanh.
             </motion.h1>
@@ -190,18 +161,18 @@ export default function HeroSection() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut", delay: 0.16 }}
-            className="mt-6 max-w-2xl text-lg leading-8 text-white/80"
+            className="mt-5 max-w-2xl text-base leading-7 text-white/80 sm:mt-6 sm:text-lg sm:leading-8"
           >
             Hoàng Long hỗ trợ chọn đúng dầu nhớt, phụ kiện và linh kiện theo
             dòng xe. Báo giá rõ ràng, tư vấn nhanh và nhận đơn bán lẻ hoặc nhập
             sỉ cho cửa hàng, gara.
           </motion.p>
 
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+          <div className="mt-7 flex flex-col gap-3 sm:mt-8 sm:flex-row">
             <ButtonLink
               href="#san-pham"
               size="lg"
-              className="border-white bg-white text-red-950 shadow-lg shadow-black/20 hover:bg-red-50"
+              className="w-full border-white bg-white text-red-950 shadow-lg shadow-black/20 hover:bg-red-50 sm:w-auto"
             >
               Xem sản phẩm
               <ArrowRight className="ml-2 h-4 w-4" />
@@ -209,13 +180,13 @@ export default function HeroSection() {
             <ButtonLink
               href="#tu-van"
               size="lg"
-              className="border-white/25 bg-white/10 text-white backdrop-blur hover:bg-white/15"
+              className="w-full border-white/25 bg-white/10 text-white backdrop-blur hover:bg-white/15 sm:w-auto"
             >
               Nhận báo giá sỉ
             </ButtonLink>
           </div>
 
-          <div className="mt-5 flex flex-wrap gap-3 text-sm font-medium text-white/80">
+          <div className="mt-5 flex flex-col gap-2 text-sm font-medium text-white/80 sm:flex-row sm:flex-wrap sm:gap-3">
             {[
               "Cam kết chính hãng",
               "500+ mã hàng có sẵn",
@@ -230,12 +201,9 @@ export default function HeroSection() {
         </motion.div>
       </div>
 
-      <motion.div
-        style={{ y: slideInfoY }}
-        className="absolute inset-x-4 bottom-6 z-10 mx-auto flex max-w-7xl flex-col gap-4 sm:inset-x-6 lg:inset-x-8 lg:flex-row lg:items-end lg:justify-between"
-      >
-        <div className="max-w-md rounded-3xl border border-white/20 bg-black/25 p-4 text-white shadow-2xl shadow-black/15 backdrop-blur-md">
-          <h2 className="text-2xl font-semibold tracking-tight">
+      <div className="absolute inset-x-4 bottom-5 z-10 mx-auto flex max-w-7xl flex-col gap-3 sm:inset-x-6 sm:bottom-6 sm:gap-4 lg:inset-x-8 lg:flex-row lg:items-end lg:justify-between">
+        <div className="max-w-md rounded-3xl border border-white/20 bg-black/30 p-4 text-white shadow-2xl shadow-black/15 backdrop-blur-md">
+          <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">
             {activeSlide.title}
           </h2>
           <p className="mt-2 text-sm leading-6 text-white/75">
@@ -243,7 +211,7 @@ export default function HeroSection() {
           </p>
         </div>
 
-        <div className="flex items-center justify-between gap-4 rounded-full border border-white/20 bg-black/20 px-4 py-3 text-white shadow-2xl shadow-black/15 backdrop-blur-md lg:justify-start">
+        <div className="flex items-center justify-between gap-3 rounded-full border border-white/20 bg-black/25 px-3 py-2.5 text-white shadow-2xl shadow-black/15 backdrop-blur-md sm:gap-4 sm:px-4 sm:py-3 lg:justify-start">
           <Button
             variant="overlay"
             size="iconSm"
@@ -281,7 +249,7 @@ export default function HeroSection() {
             <ChevronRight className="h-5 w-5" />
           </Button>
         </div>
-      </motion.div>
+      </div>
     </section>
   );
 }

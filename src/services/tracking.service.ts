@@ -22,7 +22,9 @@ export type CreateTrackingEventRequest = {
 
 const trackingService = {
   createEvent(payload: CreateTrackingEventRequest) {
-    return apiClient.post("/tracking/events", payload);
+    return apiClient.post("/tracking/events", payload, {
+      skipGlobalErrorLog: true,
+    });
   },
 };
 

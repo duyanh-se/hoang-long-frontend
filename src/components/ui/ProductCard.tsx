@@ -76,11 +76,11 @@ export function ProductCard({
         />
       </div>
 
-      <div className="flex flex-1 flex-col items-center gap-2 p-4 text-center">
-        <h3 className="line-clamp-2 min-h-[3rem] text-base font-semibold leading-6 text-zinc-950 dark:text-white">
+      <div className="flex flex-1 flex-col items-center gap-2 p-3 text-center sm:p-4">
+        <h3 className="line-clamp-2 min-h-10 text-sm font-semibold leading-5 text-zinc-950 dark:text-white sm:min-h-12 sm:text-base sm:leading-6">
           {product.name}
         </h3>
-        <p className="flex min-h-11 w-full items-center justify-center rounded-2xl border border-red-100 bg-red-50/80 px-3 py-2 text-lg font-bold text-red-700 shadow-sm dark:border-red-800 dark:bg-red-950/70 dark:text-red-200">
+        <p className="flex min-h-10 w-full items-center justify-center rounded-2xl border border-red-100 bg-red-50/80 px-2 py-2 text-sm font-bold text-red-700 shadow-sm dark:border-red-800 dark:bg-red-950/70 dark:text-red-200 sm:min-h-11 sm:px-3 sm:text-lg">
           {product.price != null
             ? formatVND(product.price)
             : "Liên hệ để biết giá"}
@@ -89,7 +89,7 @@ export function ProductCard({
           href={`/products/${product.id}`}
           variant="ghost"
           size="overlay"
-          className="mt-1 flex h-11 w-full items-center justify-center rounded-2xl border border-red-600 bg-red-600 px-5 text-white shadow-lg shadow-red-950/15 hover:bg-red-700 dark:border-red-500 dark:bg-red-500 dark:hover:bg-red-400"
+          className="mt-1 flex h-10 w-full items-center justify-center rounded-2xl border border-red-600 bg-red-600 px-3 text-xs text-white shadow-lg shadow-red-950/15 hover:bg-red-700 dark:border-red-500 dark:bg-red-500 dark:hover:bg-red-400 sm:h-11 sm:px-5 sm:text-sm"
           aria-label={`Xem chi tiết ${product.name}`}
         >
           Xem chi tiết

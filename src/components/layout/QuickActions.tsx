@@ -76,7 +76,7 @@ function QuickActionButton({
   className,
 }: QuickAction) {
   const commonClassName = cn(
-    "group relative flex h-12 w-12 items-center justify-center rounded-full bg-red-600 text-white shadow-xl shadow-red-950/20 ring-1 ring-white/40 transition-colors hover:bg-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 dark:bg-red-500 dark:hover:bg-red-400",
+    "group relative flex h-11 w-11 items-center justify-center rounded-full bg-red-600 text-white shadow-xl shadow-red-950/20 ring-1 ring-white/40 transition-colors hover:bg-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 dark:bg-red-500 dark:hover:bg-red-400 sm:h-12 sm:w-12",
     className,
   );
   const content = children ?? <Icon className="h-5 w-5" />;
@@ -121,7 +121,7 @@ export default function QuickActions() {
   return (
     <nav
       aria-label="Thao tác nhanh"
-      className="fixed bottom-5 right-4 z-40 flex flex-col items-center gap-3 sm:bottom-7 sm:right-6"
+      className="fixed bottom-[calc(1rem+env(safe-area-inset-bottom))] right-3 z-40 flex origin-bottom-right flex-col items-center gap-2 sm:bottom-7 sm:right-6 sm:gap-3 [@media(max-width:380px)]:scale-90"
     >
       {quickActions.map((action, index) => (
         <motion.div
@@ -148,7 +148,7 @@ export default function QuickActions() {
           label="Lên đầu trang"
           icon={ChevronUp}
           onClick={scrollToTop}
-          className="h-14 w-14 bg-white text-red-600 shadow-2xl shadow-zinc-950/15 hover:bg-red-50 dark:bg-zinc-950 dark:text-red-300 dark:hover:bg-red-950"
+          className="h-12 w-12 bg-white text-red-600 shadow-2xl shadow-zinc-950/15 hover:bg-red-50 dark:bg-zinc-950 dark:text-red-300 dark:hover:bg-red-950 sm:h-14 sm:w-14"
         />
       </motion.div>
     </nav>

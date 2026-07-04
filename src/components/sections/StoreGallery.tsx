@@ -69,7 +69,7 @@ export default function StoreGallery() {
   return (
     <div className="rounded-4xl border border-red-100 bg-white/80 p-0 shadow-lg shadow-red-950/5 backdrop-blur dark:border-red-800 dark:bg-red-950/50 sm:p-0">
       <div className="relative overflow-hidden rounded-4xl border border-red-100 bg-red-50/70 shadow-sm dark:border-red-800 dark:bg-red-950/60">
-        <div className="relative aspect-[16/9] overflow-hidden">
+        <div className="relative aspect-[4/3] overflow-hidden sm:aspect-[16/9]">
           <Image
             src={image.src}
             alt={image.title}
@@ -79,8 +79,8 @@ export default function StoreGallery() {
             priority
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/0 to-transparent" />
-          <div className="absolute inset-x-0 bottom-0 px-6 pb-6 pt-4 text-white">
-            <h3 className="text-2xl font-semibold tracking-tight">
+          <div className="absolute inset-x-0 bottom-0 px-4 pb-4 pt-4 text-white sm:px-6 sm:pb-6">
+            <h3 className="text-xl font-semibold tracking-tight sm:text-2xl">
               {image.title}
             </h3>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-white/80">
@@ -89,21 +89,21 @@ export default function StoreGallery() {
           </div>
         </div>
 
-        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center px-4">
+        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center px-2 sm:px-4">
           <button
             type="button"
             onClick={goToPrevious}
-            className="pointer-events-auto rounded-full border border-white/20 bg-black/30 p-3 text-white transition hover:bg-black/50"
+            className="pointer-events-auto rounded-full border border-white/20 bg-black/30 p-2.5 text-white transition hover:bg-black/50 sm:p-3"
             aria-label="Xem ảnh trước đó"
           >
             <ChevronLeft className="h-5 w-5" />
           </button>
         </div>
-        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4">
+        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 sm:px-4">
           <button
             type="button"
             onClick={goToNext}
-            className="pointer-events-auto rounded-full border border-white/20 bg-black/30 p-3 text-white transition hover:bg-black/50"
+            className="pointer-events-auto rounded-full border border-white/20 bg-black/30 p-2.5 text-white transition hover:bg-black/50 sm:p-3"
             aria-label="Xem ảnh tiếp theo"
           >
             <ChevronRight className="h-5 w-5" />
