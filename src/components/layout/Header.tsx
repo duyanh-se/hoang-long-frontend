@@ -3,19 +3,31 @@
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type FormEvent,
+} from "react";
 import { createPortal } from "react-dom";
 import {
   ChevronDown,
+  Minus,
   Moon,
   Menu,
+  PhoneCall,
+  Plus,
   Send,
   ShoppingCart,
   Sun,
+  Trash2,
   X,
 } from "lucide-react";
 import logoImg from "../../assets/images/Logo_Hoang_Long.jpg";
-import { formatVND } from "../../lib/utils";
+import { themeClassNames, typographyTokens } from "../../lib/design-tokens";
+import { cn, formatVND } from "../../lib/utils";
 import consultationService from "../../services/consultation.service";
 import { useCartStore } from "../../store/useCartStore";
 import { Button } from "../ui/Button";
@@ -36,6 +48,9 @@ export default function Header() {
   const [headerHidden, setHeaderHidden] = useState(false);
   const lastScrollYRef = useRef(0);
   const cartItems = useCartStore((state) => state.items);
+  const increaseCartItem = useCartStore((state) => state.increaseItem);
+  const decreaseCartItem = useCartStore((state) => state.decreaseItem);
+  const updateCartQuantity = useCartStore((state) => state.updateQuantity);
   const removeCartItem = useCartStore((state) => state.removeItem);
   const clearCart = useCartStore((state) => state.clearCart);
   const [hasHydrated, setHasHydrated] = useState(false);
@@ -50,6 +65,7 @@ export default function Header() {
   const [checkoutError, setCheckoutError] = useState("");
   const [checkoutSuccess, setCheckoutSuccess] = useState("");
   const [isCheckoutSubmitting, setIsCheckoutSubmitting] = useState(false);
+  const [optionalCheckoutVisible, setOptionalCheckoutVisible] = useState(false);
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
@@ -127,9 +143,13 @@ export default function Header() {
     0,
   );
   const cartTotal = visibleCartItems.reduce(
-    (total, item) => total + item.price * item.quantity,
+    (total, item) =>
+      item.requiresQuote ? total : total + item.price * item.quantity,
     0,
   );
+  const quoteItemCount = visibleCartItems.filter(
+    (item) => item.requiresQuote,
+  ).length;
 
   const ThemeIcon = useMemo(() => (theme === "dark" ? Sun : Moon), [theme]);
 
@@ -137,16 +157,25 @@ export default function Header() {
     setTheme((currentTheme) => (currentTheme === "dark" ? "light" : "dark"));
   };
 
-  const openCartDrawer = () => {
+  const openCartDrawer = useCallback(() => {
     setCheckoutError("");
     setCartDrawerOpen(true);
-  };
+  }, []);
 
   const closeCartDrawer = () => {
     setCartDrawerOpen(false);
     setCheckoutVisible(false);
     setCheckoutError("");
+    setOptionalCheckoutVisible(false);
   };
+
+  useEffect(() => {
+    window.addEventListener("hoang-long-open-cart", openCartDrawer);
+
+    return () => {
+      window.removeEventListener("hoang-long-open-cart", openCartDrawer);
+    };
+  }, [openCartDrawer]);
 
   const handleCheckoutSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -185,6 +214,7 @@ export default function Header() {
         address: "",
         note: "",
       });
+      setOptionalCheckoutVisible(false);
     } catch (error) {
       setCheckoutError(
         error instanceof Error ? error.message : "Không thể gửi đơn đặt hàng.",
@@ -214,7 +244,7 @@ export default function Header() {
         aria-label="Đóng giỏ hàng"
       />
       <motion.aside
-        className="absolute right-0 top-0 flex h-dvh w-full max-w-[min(100vw,28rem)] flex-col border-l border-black/10 bg-background shadow-2xl dark:border-white/10"
+        className={themeClassNames.cart.drawer}
         initial={{ x: "100%" }}
         animate={{ x: 0 }}
         exit={{ x: "100%" }}
@@ -224,9 +254,11 @@ export default function Header() {
         aria-modal="true"
         aria-label="Giỏ hàng"
       >
-        <div className="flex items-center justify-between border-b border-black/10 px-4 py-3 dark:border-white/10 sm:px-5 sm:py-4">
+        <div className={themeClassNames.cart.header}>
           <div>
-            <p className="text-xs uppercase tracking-[0.24em] text-zinc-500 dark:text-zinc-400">
+            <p
+              className={cn(typographyTokens.className.eyebrow, "text-[10px]")}
+            >
               Cart
             </p>
             <h2 className="text-lg font-semibold text-foreground">Giỏ hàng</h2>
@@ -244,42 +276,111 @@ export default function Header() {
 
         <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-4 sm:p-5">
           {visibleCartItems.length === 0 ? (
-            <div className="rounded-3xl border border-dashed border-black/15 bg-white p-5 text-sm text-zinc-600 dark:border-white/10 dark:bg-white/5 dark:text-zinc-300">
+            <div className="rounded-3xl border border-dashed border-(--brand-border) bg-(--brand-cream) p-5 text-sm text-zinc-600 dark:border-red-800 dark:bg-white/5 dark:text-zinc-300">
               Giỏ hàng đang trống. Hãy thêm sản phẩm từ trang chi tiết.
             </div>
           ) : (
             <div className="space-y-3">
-              {visibleCartItems.map((item) => (
-                <motion.div
-                  key={item.id}
-                  initial={{ opacity: 0, x: 18 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.28, ease: "easeOut" }}
-                  className="rounded-3xl border border-red-100 bg-white p-3 shadow-sm dark:border-red-800 dark:bg-red-950/70 sm:p-4"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="line-clamp-2 font-semibold text-zinc-950 dark:text-white">
-                        {item.name}
-                      </p>
-                      <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-                        Số lượng: {item.quantity}
-                      </p>
+              {visibleCartItems.map((item) => {
+                const needsQuote = item.requiresQuote || item.price <= 0;
+                const itemSubtotal = item.price * item.quantity;
+
+                return (
+                  <motion.div
+                    key={item.id}
+                    initial={{ opacity: 0, x: 18 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.28, ease: "easeOut" }}
+                    className={themeClassNames.cart.item}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className={themeClassNames.cart.image}>
+                        {item.imageUrl ? (
+                          <Image
+                            src={item.imageUrl}
+                            alt={`Hình ảnh ${item.name}`}
+                            fill
+                            className="object-cover"
+                            sizes="64px"
+                            unoptimized={item.imageUrl.startsWith("data:")}
+                          />
+                        ) : (
+                          <ShoppingCart className="absolute left-1/2 top-1/2 h-6 w-6 -translate-x-1/2 -translate-y-1/2 text-red-300" />
+                        )}
+                      </div>
+
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <p className="line-clamp-2 font-semibold text-zinc-950 dark:text-white">
+                              {item.name}
+                            </p>
+                            <p className="mt-1 text-sm font-semibold text-red-700 dark:text-red-200">
+                              {needsQuote
+                                ? "Liên hệ báo giá"
+                                : formatVND(item.price)}
+                            </p>
+                          </div>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="iconSm"
+                            className="h-9 w-9 shrink-0 text-red-700 dark:text-red-200"
+                            onClick={() => removeCartItem(item.id)}
+                            aria-label={`Xóa ${item.name}`}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+
+                        <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                          <div className={themeClassNames.cart.quantity}>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="iconSm"
+                              className="h-8 w-8"
+                              onClick={() => decreaseCartItem(item.id)}
+                              aria-label={`Giảm số lượng ${item.name}`}
+                            >
+                              <Minus className="h-4 w-4" />
+                            </Button>
+                            <input
+                              suppressHydrationWarning
+                              value={item.quantity}
+                              onChange={(event) =>
+                                updateCartQuantity(
+                                  item.id,
+                                  Number(event.target.value),
+                                )
+                              }
+                              inputMode="numeric"
+                              aria-label={`Số lượng ${item.name}`}
+                              className="h-8 w-12 bg-transparent text-center text-sm font-semibold text-zinc-950 outline-none dark:text-white"
+                            />
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="iconSm"
+                              className="h-8 w-8"
+                              onClick={() => increaseCartItem(item.id)}
+                              aria-label={`Tăng số lượng ${item.name}`}
+                            >
+                              <Plus className="h-4 w-4" />
+                            </Button>
+                          </div>
+
+                          <p className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">
+                            {needsQuote
+                              ? "Chờ tư vấn"
+                              : formatVND(itemSubtotal)}
+                          </p>
+                        </div>
+                      </div>
                     </div>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      className="h-8 px-3 text-xs text-red-700 dark:text-red-200"
-                      onClick={() => removeCartItem(item.id)}
-                    >
-                      Xóa
-                    </Button>
-                  </div>
-                  <p className="mt-3 text-sm font-semibold text-red-700 dark:text-red-200">
-                    {formatVND(item.price * item.quantity)}
-                  </p>
-                </motion.div>
-              ))}
+                  </motion.div>
+                );
+              })}
             </div>
           )}
 
@@ -287,26 +388,47 @@ export default function Header() {
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.32, ease: "easeOut" }}
-            className="rounded-3xl bg-[linear-gradient(135deg,rgba(251,191,36,1),rgba(249,115,22,1))] p-4 text-zinc-950 dark:bg-[linear-gradient(135deg,rgba(58,54,54,1),rgba(17,17,17,1))] dark:text-zinc-50 sm:p-5"
+            className={themeClassNames.cart.summary}
           >
-            <p className="text-sm font-medium">Số lượng sản phẩm</p>
-            <p className="mt-2 text-3xl font-semibold sm:text-4xl">
-              {cartCount}
-            </p>
-            <p className="mt-3 text-sm font-semibold">
-              Tạm tính: {formatVND(cartTotal)}
-            </p>
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-sm font-medium">Tổng số lượng</p>
+                <p className="mt-2 text-3xl font-semibold sm:text-4xl">
+                  {cartCount}
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="text-sm font-medium">Tạm tính</p>
+                <p className="mt-2 text-xl font-bold sm:text-2xl">
+                  {formatVND(cartTotal)}
+                </p>
+              </div>
+            </div>
+            {quoteItemCount > 0 ? (
+              <p className="mt-4 rounded-2xl bg-white/15 px-3 py-2 text-sm font-semibold text-white dark:bg-white/10">
+                {quoteItemCount} sản phẩm cần Hoàng Long xác nhận giá khi tư
+                vấn.
+              </p>
+            ) : null}
           </motion.div>
 
           {checkoutSuccess ? (
-            <div className="rounded-3xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200">
-              {checkoutSuccess}
+            <div className={themeClassNames.alert.success}>
+              <p className="font-semibold">{checkoutSuccess}</p>
+              <p className="mt-2 leading-6">
+                Nếu cần xử lý gấp, gọi hotline 0945 523 790 để được hỗ trợ nhanh
+                hơn.
+              </p>
             </div>
           ) : null}
 
           {checkoutError ? (
-            <div className="rounded-3xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700 dark:border-red-800 dark:bg-red-950/40 dark:text-red-200">
-              {checkoutError}
+            <div className={themeClassNames.alert.error}>
+              <p className="font-semibold">{checkoutError}</p>
+              <p className="mt-2 leading-6">
+                Vui lòng thử lại hoặc gọi trực tiếp 0945 523 790 nếu cần đặt
+                hàng ngay.
+              </p>
             </div>
           ) : null}
 
@@ -318,7 +440,8 @@ export default function Header() {
                 setCheckoutError("");
                 setCheckoutVisible((current) => !current);
               }}
-              className="h-12 border-red-600 bg-red-600 text-white hover:bg-red-700 dark:border-red-500 dark:bg-red-500 dark:hover:bg-red-400"
+              variant="primary"
+              className="h-12"
             >
               <ShoppingCart className="mr-2 h-5 w-5" />
               {checkoutVisible ? "Ẩn thông tin đặt hàng" : "Mua hàng"}
@@ -334,14 +457,21 @@ export default function Header() {
                 exit={{ opacity: 0, height: 0, y: 16 }}
                 transition={{ duration: 0.28, ease: "easeOut" }}
                 onSubmit={handleCheckoutSubmit}
-                className="space-y-3 overflow-hidden rounded-3xl border border-red-100 bg-white p-4 shadow-sm dark:border-red-800 dark:bg-red-950/70"
+                className={themeClassNames.cart.form}
               >
-                <p className="text-sm font-semibold text-zinc-950 dark:text-white">
-                  Thông tin đặt hàng
-                </p>
+                <div>
+                  <p className="text-sm font-semibold text-zinc-950 dark:text-white">
+                    Thông tin đặt hàng
+                  </p>
+                  <p className={cn("mt-1", typographyTokens.className.small)}>
+                    Chỉ cần 3 thông tin chính. Email và ghi chú có thể bổ sung
+                    nếu cần.
+                  </p>
+                </div>
                 <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-200">
                   Họ tên
                   <input
+                    suppressHydrationWarning
                     value={checkoutForm.fullName}
                     onChange={(event) =>
                       setCheckoutForm((current) => ({
@@ -350,28 +480,15 @@ export default function Header() {
                       }))
                     }
                     required
-                    className="mt-1 h-11 w-full rounded-2xl border border-red-100 bg-white px-4 text-sm outline-none transition focus:border-red-400 dark:border-red-800 dark:bg-red-950 dark:text-white"
+                    className={cn("mt-1 h-11 w-full", themeClassNames.field)}
                     placeholder="Nguyễn Văn A"
-                  />
-                </label>
-                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-200">
-                  Email
-                  <input
-                    type="email"
-                    value={checkoutForm.email}
-                    onChange={(event) =>
-                      setCheckoutForm((current) => ({
-                        ...current,
-                        email: event.target.value,
-                      }))
-                    }
-                    className="mt-1 h-11 w-full rounded-2xl border border-red-100 bg-white px-4 text-sm outline-none transition focus:border-red-400 dark:border-red-800 dark:bg-red-950 dark:text-white"
-                    placeholder="email@example.com"
                   />
                 </label>
                 <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-200">
                   Điện thoại
                   <input
+                    suppressHydrationWarning
+                    type="tel"
                     value={checkoutForm.phoneNumber}
                     onChange={(event) =>
                       setCheckoutForm((current) => ({
@@ -380,13 +497,14 @@ export default function Header() {
                       }))
                     }
                     required
-                    className="mt-1 h-11 w-full rounded-2xl border border-red-100 bg-white px-4 text-sm outline-none transition focus:border-red-400 dark:border-red-800 dark:bg-red-950 dark:text-white"
+                    className={cn("mt-1 h-11 w-full", themeClassNames.field)}
                     placeholder="0901234567"
                   />
                 </label>
                 <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-200">
                   Địa chỉ
                   <input
+                    suppressHydrationWarning
                     value={checkoutForm.address}
                     onChange={(event) =>
                       setCheckoutForm((current) => ({
@@ -395,31 +513,95 @@ export default function Header() {
                       }))
                     }
                     required
-                    className="mt-1 h-11 w-full rounded-2xl border border-red-100 bg-white px-4 text-sm outline-none transition focus:border-red-400 dark:border-red-800 dark:bg-red-950 dark:text-white"
+                    className={cn("mt-1 h-11 w-full", themeClassNames.field)}
                     placeholder="Số nhà, phường/xã, quận/huyện..."
                   />
                 </label>
-                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-200">
-                  Ghi chú
-                  <textarea
-                    value={checkoutForm.note}
-                    onChange={(event) =>
-                      setCheckoutForm((current) => ({
-                        ...current,
-                        note: event.target.value,
-                      }))
-                    }
-                    className="mt-1 min-h-24 w-full rounded-2xl border border-red-100 bg-white px-4 py-3 text-sm outline-none transition focus:border-red-400 dark:border-red-800 dark:bg-red-950 dark:text-white"
-                    placeholder="Thời gian nhận hàng, yêu cầu tư vấn thêm..."
+
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() =>
+                    setOptionalCheckoutVisible((current) => !current)
+                  }
+                  className="w-full justify-between rounded-2xl border border-(--brand-border) px-4 dark:border-red-800"
+                  aria-expanded={optionalCheckoutVisible}
+                >
+                  Email / ghi chú thêm
+                  <ChevronDown
+                    className={`h-4 w-4 transition-transform ${optionalCheckoutVisible ? "rotate-180" : ""}`}
                   />
-                </label>
+                </Button>
+
+                <AnimatePresence initial={false}>
+                  {optionalCheckoutVisible ? (
+                    <motion.div
+                      key="optional-checkout-fields"
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.22, ease: "easeOut" }}
+                      className="space-y-3 overflow-hidden"
+                    >
+                      <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-200">
+                        Email
+                        <input
+                          suppressHydrationWarning
+                          type="email"
+                          value={checkoutForm.email}
+                          onChange={(event) =>
+                            setCheckoutForm((current) => ({
+                              ...current,
+                              email: event.target.value,
+                            }))
+                          }
+                          className={cn(
+                            "mt-1 h-11 w-full",
+                            themeClassNames.field,
+                          )}
+                          placeholder="email@example.com"
+                        />
+                      </label>
+                      <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-200">
+                        Ghi chú
+                        <textarea
+                          suppressHydrationWarning
+                          value={checkoutForm.note}
+                          onChange={(event) =>
+                            setCheckoutForm((current) => ({
+                              ...current,
+                              note: event.target.value,
+                            }))
+                          }
+                          className={cn(
+                            "mt-1 min-h-24 w-full py-3",
+                            themeClassNames.field,
+                          )}
+                          placeholder="Thời gian nhận hàng, yêu cầu tư vấn thêm..."
+                        />
+                      </label>
+                    </motion.div>
+                  ) : null}
+                </AnimatePresence>
+
+                <a
+                  href="tel:0945523790"
+                  className="flex items-center justify-center gap-2 rounded-2xl border border-(--brand-border) bg-(--brand-primary-soft) px-4 py-3 text-sm font-semibold text-red-700 dark:border-red-800 dark:bg-red-950/50 dark:text-red-200"
+                >
+                  <PhoneCall className="h-4 w-4" />
+                  Cần gấp? Gọi 0945 523 790
+                </a>
                 <Button
                   type="submit"
                   disabled={isCheckoutSubmitting}
-                  className="h-12 w-full border-red-600 bg-red-600 text-white hover:bg-red-700 dark:border-red-500 dark:bg-red-500 dark:hover:bg-red-400"
+                  variant="primary"
+                  className="h-12 w-full"
                 >
                   <Send className="mr-2 h-5 w-5" />
-                  {isCheckoutSubmitting ? "Đang gửi..." : "Đặt hàng"}
+                  {isCheckoutSubmitting
+                    ? "Đang gửi..."
+                    : "Gửi yêu cầu đặt hàng"}
                 </Button>
               </motion.form>
             ) : null}

@@ -12,8 +12,9 @@ import {
   ShoppingBag,
   Star,
   Wrench,
+  type LucideIcon,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import logoCuaHang from "@/src/assets/images/logo-cua-hang.jpg";
 import QuickActions from "../components/layout/QuickActions";
 import HeroSection from "../components/sections/HeroSection";
@@ -27,7 +28,11 @@ import {
   viewportOnce,
 } from "../components/ui/motion";
 import { ProductCard } from "../components/ui/ProductCard";
-import productService, { FeaturedProduct } from "../services/product.service";
+import productService, {
+  FeaturedProduct,
+  ProductCategory,
+  ProductTag,
+} from "../services/product.service";
 
 const trustItems = [
   {
@@ -40,29 +45,6 @@ const trustItems = [
     label: "Báo giá",
     value: "15 phút",
     description: "Hỗ trợ bán lẻ và nhập sỉ",
-  },
-];
-
-const quickCategories = [
-  {
-    title: "Dầu nhớt",
-    description: "Các dòng nhớt phổ biến cho xe ga, xe số và xe côn tay.",
-    icon: Droplets,
-  },
-  {
-    title: "Phụ tùng thay thế",
-    description: "Bugi, lọc gió, bố thắng và các mã phụ tùng thông dụng.",
-    icon: Wrench,
-  },
-  {
-    title: "Phụ kiện",
-    description: "Phụ kiện bảo dưỡng, nâng cấp và chăm sóc xe máy.",
-    icon: ShoppingBag,
-  },
-  {
-    title: "Đơn sỉ cho gara",
-    description: "Hỗ trợ báo giá nhanh cho cửa hàng và gara cần nhập hàng.",
-    icon: PackageCheck,
   },
 ];
 
@@ -88,12 +70,57 @@ const customerProof = [
 
 const featuredProductsLimit = 8;
 
+type QuickCategoryCard = {
+  id: string;
+  title: string;
+  description: string;
+  href: string;
+  badge: string;
+  icon: LucideIcon;
+};
+
+function getQuickCategoryIcon(label: string): LucideIcon {
+  const normalizedLabel = label.toLowerCase();
+
+  if (normalizedLabel.includes("dầu") || normalizedLabel.includes("nhớt")) {
+    return Droplets;
+  }
+
+  if (
+    normalizedLabel.includes("phụ tùng") ||
+    normalizedLabel.includes("bugi") ||
+    normalizedLabel.includes("lọc") ||
+    normalizedLabel.includes("thắng")
+  ) {
+    return Wrench;
+  }
+
+  if (
+    normalizedLabel.includes("phụ kiện") ||
+    normalizedLabel.includes("đồ chơi")
+  ) {
+    return ShoppingBag;
+  }
+
+  return PackageCheck;
+}
+
+function getCountLabel(count: number) {
+  return `${count} sản phẩm`;
+}
+
 export default function Home() {
   const [featuredProducts, setFeaturedProducts] = useState<FeaturedProduct[]>(
     [],
   );
+  const [productCategories, setProductCategories] = useState<ProductCategory[]>(
+    [],
+  );
+  const [productTags, setProductTags] = useState<ProductTag[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isTaxonomyLoading, setIsTaxonomyLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [taxonomyError, setTaxonomyError] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadFeaturedProducts() {
@@ -116,6 +143,70 @@ export default function Home() {
 
     loadFeaturedProducts();
   }, []);
+
+  useEffect(() => {
+    async function loadProductTaxonomy() {
+      setIsTaxonomyLoading(true);
+      setTaxonomyError(null);
+
+      try {
+        const [categoriesResponse, tagsResponse] = await Promise.all([
+          productService.getProductCategories(),
+          productService.getProductTags(),
+        ]);
+
+        setProductCategories(categoriesResponse.items ?? []);
+        setProductTags(tagsResponse.items ?? []);
+      } catch (err) {
+        setTaxonomyError(
+          err instanceof Error ? err.message : "Lỗi khi tải nhóm sản phẩm",
+        );
+      } finally {
+        setIsTaxonomyLoading(false);
+      }
+    }
+
+    loadProductTaxonomy();
+  }, []);
+
+  const quickCategoryCards = useMemo<QuickCategoryCard[]>(() => {
+    const categoryCards = [...productCategories]
+      .sort((firstCategory, secondCategory) => {
+        return secondCategory.productsCount - firstCategory.productsCount;
+      })
+      .slice(0, 4)
+      .map((category) => ({
+        id: `category-${category.id}`,
+        title: category.name,
+        description:
+          category.description?.trim() ||
+          `${getCountLabel(category.productsCount)} trong nhóm ${category.name}.`,
+        href: `/products?categoryId=${category.id}`,
+        badge: getCountLabel(category.productsCount),
+        icon: getQuickCategoryIcon(category.name),
+      }));
+
+    if (categoryCards.length >= 4) {
+      return categoryCards;
+    }
+
+    const remainingSlots = 4 - categoryCards.length;
+    const tagCards = [...productTags]
+      .sort((firstTag, secondTag) => {
+        return secondTag.productsCount - firstTag.productsCount;
+      })
+      .slice(0, remainingSlots)
+      .map((tag) => ({
+        id: `tag-${tag.id}`,
+        title: tag.name,
+        description: `${getCountLabel(tag.productsCount)} đang gắn tag ${tag.name}.`,
+        href: `/products?tagId=${tag.id}`,
+        badge: getCountLabel(tag.productsCount),
+        icon: getQuickCategoryIcon(tag.name),
+      }));
+
+    return [...categoryCards, ...tagCards];
+  }, [productCategories, productTags]);
 
   return (
     <motion.div
@@ -140,13 +231,13 @@ export default function Home() {
       >
         <motion.div
           variants={scaleInVariants}
-          className="overflow-hidden rounded-[2rem] border border-red-100 bg-white/85 shadow-xl shadow-red-950/5 backdrop-blur dark:border-red-800 dark:bg-red-950/45"
+          className="overflow-hidden rounded-4xl border border-red-100 bg-white/85 shadow-xl shadow-red-950/5 backdrop-blur dark:border-red-800 dark:bg-red-950/45"
         >
           <div className="grid gap-0 lg:grid-cols-[0.95fr_1.05fr] lg:items-stretch">
-            <div className="relative min-h-[240px] border-b border-red-100 bg-red-50/70 dark:border-red-800 dark:bg-red-950/60 sm:min-h-[320px] lg:min-h-full lg:border-b-0 lg:border-r">
-              <div className="absolute inset-0 bg-gradient-to-br from-red-100/70 via-transparent to-amber-100/40 dark:from-red-900/30 dark:to-red-950/20" />
+            <div className="relative min-h-60 border-b border-red-100 bg-red-50/70 dark:border-red-800 dark:bg-red-950/60 sm:min-h-80 lg:min-h-full lg:border-b-0 lg:border-r">
+              <div className="absolute inset-0 bg-linear-to-br from-red-100/70 via-transparent to-amber-100/40 dark:from-red-900/30 dark:to-red-950/20" />
               <div className="relative flex h-full items-center justify-center p-4 sm:p-8">
-                <div className="relative aspect-[4/3] w-full max-w-lg overflow-hidden rounded-[1.5rem] border border-red-100 bg-white shadow-2xl shadow-red-950/10 dark:border-red-800 dark:bg-red-950/60 sm:rounded-[1.75rem]">
+                <div className="relative aspect-4/3 w-full max-w-lg overflow-hidden rounded-3xl border border-red-100 bg-white shadow-2xl shadow-red-950/10 dark:border-red-800 dark:bg-red-950/60 sm:rounded-[1.75rem]">
                   <Image
                     src={logoCuaHang}
                     alt="Hình ảnh logo cửa hàng phụ tùng xe máy Hoàng Long"
@@ -255,30 +346,66 @@ export default function Home() {
           variants={staggerContainerVariants}
           className="mt-6 grid grid-cols-1 gap-3 sm:mt-8 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4"
         >
-          {quickCategories.map(({ title, description, icon: CategoryIcon }) => (
-            <motion.div
-              key={title}
-              variants={scaleInVariants}
-              whileHover={{ y: -6 }}
-              transition={{ duration: 0.22, ease: "easeOut" }}
-            >
-              <Link
-                href="/products"
-                className="group block h-full rounded-3xl border border-red-100 bg-white/90 p-4 shadow-sm transition-all duration-300 hover:border-red-200 hover:shadow-xl hover:shadow-red-950/10 dark:border-red-800 dark:bg-red-950/60 dark:hover:border-red-600 sm:rounded-4xl sm:p-5"
+          {isTaxonomyLoading ? (
+            Array.from({ length: 4 }, (_, index) => (
+              <motion.div
+                key={index}
+                variants={scaleInVariants}
+                className="h-52 animate-pulse rounded-3xl border border-red-100 bg-white/80 p-4 shadow-sm dark:border-red-800 dark:bg-red-950/60 sm:rounded-4xl sm:p-5"
               >
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-red-600 text-white shadow-lg shadow-red-950/15 transition group-hover:scale-105 dark:bg-red-500">
-                  <CategoryIcon className="h-5 w-5" />
-                </div>
-                <h3 className="mt-4 font-semibold text-zinc-950 dark:text-white">
-                  {title}
-                </h3>
-                <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-300">
-                  {description}
-                </p>
-              </Link>
+                <div className="h-12 w-12 rounded-2xl bg-red-100 dark:bg-red-900/60" />
+                <div className="mt-5 h-4 w-32 rounded-full bg-zinc-200 dark:bg-white/10" />
+                <div className="mt-4 h-3 w-full rounded-full bg-zinc-200 dark:bg-white/10" />
+                <div className="mt-2 h-3 w-3/4 rounded-full bg-zinc-200 dark:bg-white/10" />
+              </motion.div>
+            ))
+          ) : quickCategoryCards.length === 0 ? (
+            <motion.div
+              variants={scaleInVariants}
+              className="col-span-full rounded-3xl border border-red-100 bg-white/90 p-5 text-sm font-semibold text-zinc-700 shadow-sm dark:border-red-800 dark:bg-red-950/60 dark:text-zinc-200 sm:rounded-4xl"
+            >
+              Chưa có nhóm sản phẩm để hiển thị. Bạn vẫn có thể xem toàn bộ danh
+              sách sản phẩm.
             </motion.div>
-          ))}
+          ) : (
+            quickCategoryCards.map(
+              ({ id, title, description, href, badge, icon: CategoryIcon }) => (
+                <motion.div
+                  key={id}
+                  variants={scaleInVariants}
+                  whileHover={{ y: -6 }}
+                  transition={{ duration: 0.22, ease: "easeOut" }}
+                >
+                  <Link
+                    href={href}
+                    className="group block h-full rounded-3xl border border-red-100 bg-white/90 p-4 shadow-sm transition-all duration-300 hover:border-red-200 hover:shadow-xl hover:shadow-red-950/10 dark:border-red-800 dark:bg-red-950/60 dark:hover:border-red-600 sm:rounded-4xl sm:p-5"
+                  >
+                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-red-600 text-white shadow-lg shadow-red-950/15 transition group-hover:scale-105 dark:bg-red-500">
+                      <CategoryIcon className="h-5 w-5" />
+                    </div>
+                    <div className="mt-4 flex items-start justify-between gap-3">
+                      <h3 className="font-semibold text-zinc-950 dark:text-white">
+                        {title}
+                      </h3>
+                      <span className="rounded-full bg-red-50 px-2.5 py-1 text-[11px] font-bold text-red-700 dark:bg-red-900/40 dark:text-red-100">
+                        {badge}
+                      </span>
+                    </div>
+                    <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-300">
+                      {description}
+                    </p>
+                  </Link>
+                </motion.div>
+              ),
+            )
+          )}
         </motion.div>
+
+        {taxonomyError ? (
+          <p className="mt-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-700 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-200">
+            {taxonomyError}
+          </p>
+        ) : null}
 
         <motion.div
           initial="hidden"

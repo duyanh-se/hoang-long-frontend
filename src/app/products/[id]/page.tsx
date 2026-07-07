@@ -67,6 +67,35 @@ function formatSpecValue(value: unknown) {
   return JSON.stringify(value);
 }
 
+const specLabelMap: Record<string, string> = {
+  brand: "Thương hiệu",
+  capacity: "Dung tích",
+  color: "Màu sắc",
+  compatibleModels: "Dòng xe phù hợp",
+  material: "Chất liệu",
+  model: "Mã sản phẩm",
+  origin: "Xuất xứ",
+  size: "Kích thước",
+  sku: "Mã SKU",
+  viscosity: "Độ nhớt",
+  weight: "Khối lượng",
+};
+
+function formatSpecLabel(key: string) {
+  const mappedLabel = specLabelMap[key];
+
+  if (mappedLabel) {
+    return mappedLabel;
+  }
+
+  return key
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/[-_]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/^./, (firstLetter) => firstLetter.toUpperCase());
+}
+
 export default function ProductDetailPage() {
   const params = useParams<{ id?: string | string[] }>();
   const productId = Array.isArray(params.id) ? params.id[0] : params.id;
@@ -128,6 +157,7 @@ export default function ProductDetailPage() {
       name: product.name,
       price: product.price ?? 0,
       quantity: 1,
+      requiresQuote: product.price == null,
       imageUrl: typeof imageSrc === "string" ? imageSrc : undefined,
     });
     trackEvent("ADD_TO_CART", {
@@ -137,7 +167,11 @@ export default function ProductDetailPage() {
     });
 
     setAddedMessage("Đã thêm sản phẩm vào giỏ hàng.");
-    window.setTimeout(() => setAddedMessage(""), 2200);
+    window.setTimeout(() => setAddedMessage(""), 6000);
+  };
+
+  const openCartDrawer = () => {
+    window.dispatchEvent(new Event("hoang-long-open-cart"));
   };
 
   if (!productId) {
@@ -251,7 +285,7 @@ export default function ProductDetailPage() {
   return (
     <motion.div
       {...pageFadeIn}
-      className="min-h-screen bg-[linear-gradient(180deg,rgba(251,191,36,0.14),rgba(255,255,255,0))] text-foreground"
+      className="min-h-screen bg-[linear-gradient(180deg,rgba(251,191,36,0.14),rgba(255,255,255,0))] pb-24 text-foreground lg:pb-0"
     >
       <script
         type="application/ld+json"
@@ -364,9 +398,23 @@ export default function ProductDetailPage() {
             </div>
 
             {addedMessage ? (
-              <p className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200">
-                {addedMessage}
-              </p>
+              <div className="mt-4 rounded-3xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700 shadow-sm dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200">
+                <p className="font-semibold">{addedMessage}</p>
+                <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+                  <Button
+                    type="button"
+                    variant="neutral"
+                    size="sm"
+                    onClick={openCartDrawer}
+                    className="border-emerald-200 bg-white text-emerald-700 hover:bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-100"
+                  >
+                    Xem giỏ hàng
+                  </Button>
+                  <ButtonLink href="/products" variant="ghost" size="sm">
+                    Tiếp tục xem sản phẩm
+                  </ButtonLink>
+                </div>
+              </div>
             ) : null}
 
             {product.tags?.length ? (
@@ -416,7 +464,7 @@ export default function ProductDetailPage() {
                   className="rounded-3xl border border-red-100 bg-red-50/70 p-4 dark:border-red-800 dark:bg-red-950/40"
                 >
                   <p className="text-xs font-semibold uppercase tracking-[0.16em] text-red-500 dark:text-red-300">
-                    {key}
+                    {formatSpecLabel(key)}
                   </p>
                   <p className="mt-2 text-sm font-semibold text-zinc-800 dark:text-zinc-100">
                     {value}
@@ -427,6 +475,29 @@ export default function ProductDetailPage() {
           </motion.div>
         ) : null}
       </motion.section>
+
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-red-100 bg-white/95 p-3 shadow-2xl shadow-red-950/20 backdrop-blur dark:border-red-800 dark:bg-red-950/95 lg:hidden">
+        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-3">
+          <Button
+            type="button"
+            onClick={handleAddToCart}
+            disabled={!product.isActive}
+            variant="primary"
+            className="h-12 w-full px-3 text-xs sm:text-sm"
+          >
+            <ShoppingCart className="mr-2 h-4 w-4" />
+            Thêm giỏ
+          </Button>
+          <ButtonLink
+            href="/#tu-van"
+            variant="neutral"
+            className="h-12 w-full px-3 text-xs sm:text-sm"
+          >
+            <MessageCircle className="mr-2 h-4 w-4" />
+            Tư vấn
+          </ButtonLink>
+        </div>
+      </div>
     </motion.div>
   );
 }

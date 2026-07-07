@@ -5,7 +5,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowRight,
   BadgePercent,
-  CheckCircle2,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
@@ -104,8 +103,8 @@ export default function HeroSection() {
         </motion.div>
       </AnimatePresence>
 
-      <div className="absolute inset-0 -z-20 bg-linear-to-r from-red-950/70 via-red-950/35 to-black/5" />
-      <div className="absolute inset-0 -z-20 bg-linear-to-t from-black/35 via-transparent to-black/10" />
+      <div className="absolute inset-0 -z-20 bg-linear-to-r from-red-950/75 via-red-950/40 to-black/10" />
+      <div className="absolute inset-0 -z-20 bg-linear-to-t from-black/45 via-transparent to-black/10" />
       <div
         className="pointer-events-none absolute inset-0 -z-10 opacity-20"
         style={{
@@ -119,7 +118,7 @@ export default function HeroSection() {
       <div className="pointer-events-none absolute -right-12 top-44 h-44 w-44 rounded-full bg-amber-300/25 blur-3xl" />
 
       <div className="mx-auto flex min-h-180 w-full max-w-7xl items-start px-4 pb-56 pt-16 sm:min-h-[calc(100vh-5rem)] sm:items-center sm:px-6 sm:py-20 lg:px-8 lg:py-24">
-        <motion.div className="max-w-4xl rounded-[1.75rem] border border-white/15 bg-black/30 p-5 shadow-2xl shadow-black/15 backdrop-blur-[2px] sm:rounded-4xl sm:p-8 lg:pb-20">
+        <motion.div className="max-w-3xl rounded-[1.75rem] border border-white/15 bg-black/30 p-5 shadow-2xl shadow-black/15 backdrop-blur-[2px] sm:rounded-4xl sm:p-8 lg:pb-10">
           <motion.div
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
@@ -127,7 +126,7 @@ export default function HeroSection() {
             className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-white shadow-sm backdrop-blur sm:px-4 sm:text-xs sm:tracking-[0.24em]"
           >
             <BadgePercent className="h-4 w-4 shrink-0" />
-            Phụ tùng chính hãng cho khách lẻ & gara
+            Hoàng Long Motorbike Parts
           </motion.div>
 
           <div className="mt-5 flex flex-col gap-4 sm:mt-6 sm:flex-row sm:items-center sm:gap-5">
@@ -153,7 +152,7 @@ export default function HeroSection() {
               transition={{ duration: 0.8, ease: "easeOut", delay: 0.08 }}
               className="max-w-4xl text-3xl font-semibold tracking-tight text-white sm:text-5xl lg:text-7xl"
             >
-              Phụ tùng xe máy chính hãng, có sẵn, giao nhanh.
+              Tìm đúng phụ tùng xe máy nhanh hơn.
             </motion.h1>
           </div>
 
@@ -163,18 +162,17 @@ export default function HeroSection() {
             transition={{ duration: 0.8, ease: "easeOut", delay: 0.16 }}
             className="mt-5 max-w-2xl text-base leading-7 text-white/80 sm:mt-6 sm:text-lg sm:leading-8"
           >
-            Hoàng Long hỗ trợ chọn đúng dầu nhớt, phụ kiện và linh kiện theo
-            dòng xe. Báo giá rõ ràng, tư vấn nhanh và nhận đơn bán lẻ hoặc nhập
-            sỉ cho cửa hàng, gara.
+            Chọn phụ tùng, dầu nhớt và vật tư bảo dưỡng theo nhu cầu thực tế.
+            Nếu chưa chắc mã hàng, gửi dòng xe để được tư vấn và báo giá nhanh.
           </motion.p>
 
           <div className="mt-7 flex flex-col gap-3 sm:mt-8 sm:flex-row">
             <ButtonLink
-              href="#san-pham"
+              href="/products"
               size="lg"
               className="w-full border-white bg-white text-red-950 shadow-lg shadow-black/20 hover:bg-red-50 sm:w-auto"
             >
-              Xem sản phẩm
+              Tìm sản phẩm
               <ArrowRight className="ml-2 h-4 w-4" />
             </ButtonLink>
             <ButtonLink
@@ -182,27 +180,14 @@ export default function HeroSection() {
               size="lg"
               className="w-full border-white/25 bg-white/10 text-white backdrop-blur hover:bg-white/15 sm:w-auto"
             >
-              Nhận báo giá sỉ
+              Gửi yêu cầu tư vấn
             </ButtonLink>
-          </div>
-
-          <div className="mt-5 flex flex-col gap-2 text-sm font-medium text-white/80 sm:flex-row sm:flex-wrap sm:gap-3">
-            {[
-              "Cam kết chính hãng",
-              "500+ mã hàng có sẵn",
-              "Báo giá trong 15 phút",
-            ].map((item) => (
-              <span key={item} className="inline-flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-amber-300" />
-                {item}
-              </span>
-            ))}
           </div>
         </motion.div>
       </div>
 
       <div className="absolute inset-x-4 bottom-5 z-10 mx-auto flex max-w-7xl flex-col gap-3 sm:inset-x-6 sm:bottom-6 sm:gap-4 lg:inset-x-8 lg:flex-row lg:items-end lg:justify-between">
-        <div className="max-w-md rounded-3xl border border-white/20 bg-black/30 p-4 text-white shadow-2xl shadow-black/15 backdrop-blur-md">
+        <div className="hidden max-w-md rounded-3xl border border-white/20 bg-black/30 p-4 text-white shadow-2xl shadow-black/15 backdrop-blur-md sm:block">
           <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">
             {activeSlide.title}
           </h2>
@@ -225,6 +210,7 @@ export default function HeroSection() {
           <div className="flex items-center gap-2">
             {heroSlides.map((slide, index) => (
               <button
+                suppressHydrationWarning
                 key={slide.title}
                 type="button"
                 onClick={() => setActiveIndex(index)}

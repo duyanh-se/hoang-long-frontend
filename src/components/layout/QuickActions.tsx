@@ -1,8 +1,9 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { ChevronUp, MapPin, MessageCircle, Phone } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ChevronUp, MapPin, MessageCircle, Phone, X } from "lucide-react";
 import type { ComponentType, ReactNode, SVGProps } from "react";
+import { useState } from "react";
 import { cn } from "@/src/lib/utils";
 
 type QuickAction = {
@@ -51,19 +52,28 @@ const quickActions: QuickAction[] = [
 const actionVariants = {
   hidden: {
     opacity: 0,
-    x: 28,
-    scale: 0.9,
+    y: 12,
+    scale: 0.96,
   },
   visible: (index: number) => ({
     opacity: 1,
-    x: 0,
+    y: 0,
     scale: 1,
     transition: {
-      delay: 0.18 + index * 0.07,
-      duration: 0.36,
+      delay: index * 0.04,
+      duration: 0.24,
       ease: "easeOut" as const,
     },
   }),
+  exit: {
+    opacity: 0,
+    y: 10,
+    scale: 0.96,
+    transition: {
+      duration: 0.18,
+      ease: "easeIn" as const,
+    },
+  },
 };
 
 function QuickActionButton({
@@ -74,12 +84,18 @@ function QuickActionButton({
   onClick,
   children,
   className,
-}: QuickAction) {
+  onSelect,
+}: QuickAction & { onSelect?: () => void }) {
   const commonClassName = cn(
-    "group relative flex h-11 w-11 items-center justify-center rounded-full bg-red-600 text-white shadow-xl shadow-red-950/20 ring-1 ring-white/40 transition-colors hover:bg-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 dark:bg-red-500 dark:hover:bg-red-400 sm:h-12 sm:w-12",
+    "group flex min-h-12 w-64 max-w-[calc(100vw-2rem)] items-center gap-3 rounded-2xl border border-red-100 bg-white/95 px-4 py-3 text-left text-sm font-semibold text-zinc-800 shadow-xl shadow-red-950/10 backdrop-blur transition-all hover:-translate-y-0.5 hover:border-red-200 hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 dark:border-red-800 dark:bg-red-950/95 dark:text-zinc-100 dark:hover:bg-red-900/70",
     className,
   );
   const content = children ?? <Icon className="h-5 w-5" />;
+  const iconWrapper = (
+    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-red-600 text-white shadow-lg shadow-red-950/15 transition group-hover:scale-105 dark:bg-red-500">
+      {content}
+    </span>
+  );
 
   if (href) {
     return (
@@ -90,67 +106,106 @@ function QuickActionButton({
         target={isExternal ? "_blank" : undefined}
         rel={isExternal ? "noreferrer" : undefined}
         className={commonClassName}
-        whileHover={{ y: -3, scale: 1.06 }}
-        whileTap={{ scale: 0.94 }}
+        onClick={onSelect}
+        whileTap={{ scale: 0.98 }}
       >
-        {content}
+        {iconWrapper}
+        <span className="min-w-0 flex-1">{label}</span>
       </motion.a>
     );
   }
 
   return (
     <motion.button
+      suppressHydrationWarning
       type="button"
       aria-label={label}
       title={label}
-      onClick={onClick}
+      onClick={() => {
+        onClick?.();
+        onSelect?.();
+      }}
       className={commonClassName}
-      whileHover={{ y: -3, scale: 1.06 }}
-      whileTap={{ scale: 0.94 }}
+      whileTap={{ scale: 0.98 }}
     >
-      {content}
+      {iconWrapper}
+      <span className="min-w-0 flex-1">{label}</span>
     </motion.button>
   );
 }
 
 export default function QuickActions() {
+  const [menuOpen, setMenuOpen] = useState(false);
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const actionsWithTop: QuickAction[] = [
+    ...quickActions,
+    {
+      label: "Lên đầu trang",
+      icon: ChevronUp,
+      onClick: scrollToTop,
+    },
+  ];
+
   return (
     <nav
       aria-label="Thao tác nhanh"
-      className="fixed bottom-[calc(1rem+env(safe-area-inset-bottom))] right-3 z-40 flex origin-bottom-right flex-col items-center gap-2 sm:bottom-7 sm:right-6 sm:gap-3 [@media(max-width:380px)]:scale-90"
+      className="fixed bottom-[calc(5.25rem+env(safe-area-inset-bottom))] right-3 z-40 flex origin-bottom-right flex-col items-end gap-3 sm:bottom-7 sm:right-6 [@media(max-width:380px)]:scale-90"
     >
-      {quickActions.map((action, index) => (
-        <motion.div
-          key={action.label}
-          custom={index}
-          initial="hidden"
-          animate="visible"
-          variants={actionVariants}
-          className="relative"
-        >
-          <span className="absolute inset-0 rounded-full bg-red-500/30 blur-md transition-opacity group-hover:opacity-80" />
-          <QuickActionButton {...action} />
-        </motion.div>
-      ))}
+      <AnimatePresence>
+        {menuOpen ? (
+          <motion.div
+            key="quick-actions-menu"
+            initial={{ opacity: 0, y: 12, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 12, scale: 0.98 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className="flex flex-col items-end gap-2"
+          >
+            {actionsWithTop.map((action, index) => (
+              <motion.div
+                key={action.label}
+                custom={index}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                variants={actionVariants}
+              >
+                <QuickActionButton
+                  {...action}
+                  onSelect={() => setMenuOpen(false)}
+                />
+              </motion.div>
+            ))}
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
 
-      <motion.div
-        custom={quickActions.length}
-        initial="hidden"
-        animate="visible"
-        variants={actionVariants}
-        className="pt-1"
+      <motion.button
+        suppressHydrationWarning
+        type="button"
+        aria-label={menuOpen ? "Đóng thao tác nhanh" : "Mở thao tác nhanh"}
+        aria-expanded={menuOpen}
+        onClick={() => setMenuOpen((current) => !current)}
+        className="group flex h-14 items-center gap-2 rounded-full bg-red-600 px-4 text-sm font-bold text-white shadow-2xl shadow-red-950/25 ring-1 ring-white/40 transition hover:bg-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 dark:bg-red-500 dark:hover:bg-red-400"
+        initial={{ opacity: 0, y: 18, scale: 0.94 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.28, ease: "easeOut" }}
+        whileHover={{ y: -2, scale: 1.03 }}
+        whileTap={{ scale: 0.96 }}
       >
-        <QuickActionButton
-          label="Lên đầu trang"
-          icon={ChevronUp}
-          onClick={scrollToTop}
-          className="h-12 w-12 bg-white text-red-600 shadow-2xl shadow-zinc-950/15 hover:bg-red-50 dark:bg-zinc-950 dark:text-red-300 dark:hover:bg-red-950 sm:h-14 sm:w-14"
-        />
-      </motion.div>
+        <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/15">
+          {menuOpen ? (
+            <X className="h-5 w-5" />
+          ) : (
+            <MessageCircle className="h-5 w-5" />
+          )}
+        </span>
+        <span className="hidden sm:inline">Liên hệ nhanh</span>
+      </motion.button>
     </nav>
   );
 }

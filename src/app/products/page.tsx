@@ -1,9 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Search, SlidersHorizontal } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
-import { Button } from "../../components/ui/Button";
+import { Search, SlidersHorizontal, X } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
+import { Button, ButtonLink } from "../../components/ui/Button";
 import {
   fadeUpVariants,
   pageFadeIn,
@@ -20,17 +21,61 @@ import productService, {
 } from "../../services/product.service";
 
 const pageSize = 9;
+type QueryUpdates = Record<string, number | string | null | undefined>;
 
-export default function ProductsPage() {
+function getPositivePage(value: string | null) {
+  const parsedPage = Number(value);
+
+  if (!Number.isFinite(parsedPage) || parsedPage < 1) {
+    return 1;
+  }
+
+  return Math.floor(parsedPage);
+}
+
+function ProductsPageFallback() {
+  return (
+    <div className="mx-auto flex min-h-[50vh] w-full max-w-7xl items-center justify-center px-4 py-20 text-sm font-semibold text-zinc-600 dark:text-zinc-300 sm:px-6 lg:px-8">
+      Đang chuẩn bị danh mục sản phẩm...
+    </div>
+  );
+}
+
+function ProductGridSkeleton() {
+  return Array.from({ length: 6 }, (_, index) => (
+    <motion.div
+      key={index}
+      variants={fadeUpVariants}
+      className="min-h-72 animate-pulse rounded-3xl border border-red-100 bg-white p-3 shadow-sm dark:border-red-800 dark:bg-red-950/50 sm:p-4"
+    >
+      <div className="h-36 rounded-2xl bg-red-100 dark:bg-red-900/60 sm:h-44" />
+      <div className="mt-4 h-3 w-20 rounded-full bg-red-100 dark:bg-red-900/60" />
+      <div className="mt-3 h-4 w-4/5 rounded-full bg-zinc-200 dark:bg-white/10" />
+      <div className="mt-2 h-4 w-3/5 rounded-full bg-zinc-200 dark:bg-white/10" />
+      <div className="mt-5 h-10 rounded-full bg-red-100 dark:bg-red-900/60" />
+    </motion.div>
+  ));
+}
+
+function ProductsPageContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<ProductCategory[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [tags, setTags] = useState<ProductTag[]>([]);
-  const [search, setSearch] = useState("");
-  const [activeCategoryId, setActiveCategoryId] = useState("");
-  const [activeBrandId, setActiveBrandId] = useState("");
-  const [activeTagId, setActiveTagId] = useState("");
-  const [page, setPage] = useState(1);
+  const search = searchParams.get("search") ?? "";
+  const activeCategoryId = searchParams.get("categoryId") ?? "";
+  const activeBrandId = searchParams.get("brandId") ?? "";
+  const activeTagId = searchParams.get("tagId") ?? "";
+  const page = getPositivePage(searchParams.get("page"));
+  const [searchDraft, setSearchDraft] = useState({
+    source: search,
+    value: search,
+  });
+  const searchInput =
+    searchDraft.source === search ? searchDraft.value : search;
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [hasNextPage, setHasNextPage] = useState(false);
@@ -38,6 +83,62 @@ export default function ProductsPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isTaxonomyLoading, setIsTaxonomyLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const updateQueryParams = useCallback(
+    (
+      updates: QueryUpdates,
+      options: { resetPage?: boolean; replace?: boolean } = {},
+    ) => {
+      const nextParams = new URLSearchParams(searchParams.toString());
+
+      Object.entries(updates).forEach(([key, value]) => {
+        if (value == null || value === "") {
+          nextParams.delete(key);
+          return;
+        }
+
+        nextParams.set(key, String(value));
+      });
+
+      if (options.resetPage) {
+        nextParams.delete("page");
+      }
+
+      const queryString = nextParams.toString();
+      const nextHref = queryString ? `/products?${queryString}` : "/products";
+      if (options.replace) {
+        router.replace(nextHref, { scroll: false });
+        return;
+      }
+
+      router.push(nextHref, { scroll: false });
+    },
+    [router, searchParams],
+  );
+
+  const setSearchInput = useCallback(
+    (value: string) => {
+      setSearchDraft({ source: search, value });
+    },
+    [search],
+  );
+
+  useEffect(() => {
+    const normalizedSearch = searchInput.trim();
+
+    if (normalizedSearch === search) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      updateQueryParams(
+        { search: normalizedSearch || null },
+        { replace: true, resetPage: true },
+      );
+    }, 450);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [search, searchInput, updateQueryParams]);
 
   useEffect(() => {
     async function loadTaxonomy() {
@@ -100,6 +201,67 @@ export default function ProductsPage() {
     search.trim() || activeCategoryId || activeBrandId || activeTagId,
   );
 
+  const activeCategory = useMemo(
+    () => categories.find((category) => category.id === activeCategoryId),
+    [activeCategoryId, categories],
+  );
+  const activeBrand = useMemo(
+    () => brands.find((brand) => brand.id === activeBrandId),
+    [activeBrandId, brands],
+  );
+  const activeTag = useMemo(
+    () => tags.find((tag) => tag.id === activeTagId),
+    [activeTagId, tags],
+  );
+
+  const selectedFilters = useMemo(
+    () =>
+      [
+        search.trim()
+          ? {
+              key: "search",
+              label: `Tìm: ${search.trim()}`,
+              clear: () => {
+                setSearchInput("");
+                updateQueryParams({ search: null }, { resetPage: true });
+              },
+            }
+          : null,
+        activeCategory
+          ? {
+              key: "categoryId",
+              label: `Danh mục: ${activeCategory.name}`,
+              clear: () =>
+                updateQueryParams({ categoryId: null }, { resetPage: true }),
+            }
+          : null,
+        activeBrand
+          ? {
+              key: "brandId",
+              label: `Thương hiệu: ${activeBrand.name}`,
+              clear: () =>
+                updateQueryParams({ brandId: null }, { resetPage: true }),
+            }
+          : null,
+        activeTag
+          ? {
+              key: "tagId",
+              label: `Tag: ${activeTag.name}`,
+              clear: () =>
+                updateQueryParams({ tagId: null }, { resetPage: true }),
+            }
+          : null,
+      ].filter(Boolean) as { key: string; label: string; clear: () => void }[],
+    [
+      activeBrand,
+      activeCategory,
+      activeTag,
+      search,
+      setSearchInput,
+      updateQueryParams,
+    ],
+  );
+
   const paginationPages = useMemo(() => {
     const pages = new Set([1, totalPages, page - 1, page, page + 1]);
 
@@ -108,17 +270,18 @@ export default function ProductsPage() {
       .sort((firstPage, secondPage) => firstPage - secondPage);
   }, [page, totalPages]);
 
-  const resetPageAndSet = (setter: (value: string) => void, value: string) => {
-    setter(value);
-    setPage(1);
-  };
-
   const clearFilters = () => {
-    setSearch("");
-    setActiveCategoryId("");
-    setActiveBrandId("");
-    setActiveTagId("");
-    setPage(1);
+    setSearchInput("");
+    updateQueryParams(
+      {
+        search: null,
+        categoryId: null,
+        brandId: null,
+        tagId: null,
+        page: null,
+      },
+      { replace: true },
+    );
   };
 
   return (
@@ -175,87 +338,121 @@ export default function ProductsPage() {
                     : `${total} sản phẩm`}
                 </p>
               </div>
-              <SlidersHorizontal className="h-5 w-5 text-red-600 dark:text-red-300" />
+              <div className="flex items-center gap-2">
+                <SlidersHorizontal className="h-5 w-5 text-red-600 dark:text-red-300" />
+                <Button
+                  type="button"
+                  variant="neutral"
+                  size="sm"
+                  className="lg:hidden"
+                  onClick={() => setFiltersOpen((current) => !current)}
+                  aria-expanded={filtersOpen}
+                >
+                  {filtersOpen ? "Ẩn" : "Lọc"}
+                </Button>
+              </div>
             </div>
 
-            <label className="mt-5 flex flex-col gap-2 text-sm font-medium text-zinc-700 dark:text-zinc-200">
-              Tìm kiếm
-              <div className="relative">
-                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
-                <input
-                  value={search}
+            <div className={`${filtersOpen ? "block" : "hidden"} lg:block`}>
+              <label className="mt-5 flex flex-col gap-2 text-sm font-medium text-zinc-700 dark:text-zinc-200">
+                Tìm kiếm
+                <div className="relative">
+                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+                  <input
+                    suppressHydrationWarning
+                    value={searchInput}
+                    onChange={(event) => setSearchInput(event.target.value)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter") {
+                        updateQueryParams(
+                          { search: searchInput.trim() || null },
+                          { resetPage: true },
+                        );
+                      }
+                    }}
+                    placeholder="Nhập tên, mã sản phẩm..."
+                    className="h-11 w-full rounded-2xl border border-red-100 bg-white pl-10 pr-4 text-sm outline-none transition focus:border-red-400 dark:border-red-800 dark:bg-red-950 dark:text-white"
+                  />
+                </div>
+              </label>
+
+              <label className="mt-4 flex flex-col gap-2 text-sm font-medium text-zinc-700 dark:text-zinc-200">
+                Danh mục
+                <select
+                  suppressHydrationWarning
+                  value={activeCategoryId}
                   onChange={(event) =>
-                    resetPageAndSet(setSearch, event.target.value)
+                    updateQueryParams(
+                      { categoryId: event.target.value || null },
+                      { resetPage: true },
+                    )
                   }
-                  placeholder="Nhập tên, mã sản phẩm..."
-                  className="h-11 w-full rounded-2xl border border-red-100 bg-white pl-10 pr-4 text-sm outline-none transition focus:border-red-400 dark:border-red-800 dark:bg-red-950 dark:text-white"
-                />
-              </div>
-            </label>
+                  className="h-11 rounded-2xl border border-red-100 bg-white px-4 text-sm outline-none transition focus:border-red-400 dark:border-red-800 dark:bg-red-950 dark:text-white"
+                >
+                  <option value="">Tất cả danh mục</option>
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.name} ({category.productsCount})
+                    </option>
+                  ))}
+                </select>
+              </label>
 
-            <label className="mt-4 flex flex-col gap-2 text-sm font-medium text-zinc-700 dark:text-zinc-200">
-              Danh mục
-              <select
-                value={activeCategoryId}
-                onChange={(event) =>
-                  resetPageAndSet(setActiveCategoryId, event.target.value)
-                }
-                className="h-11 rounded-2xl border border-red-100 bg-white px-4 text-sm outline-none transition focus:border-red-400 dark:border-red-800 dark:bg-red-950 dark:text-white"
-              >
-                <option value="">Tất cả danh mục</option>
-                {categories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name} ({category.productsCount})
-                  </option>
-                ))}
-              </select>
-            </label>
+              <label className="mt-4 flex flex-col gap-2 text-sm font-medium text-zinc-700 dark:text-zinc-200">
+                Thương hiệu
+                <select
+                  suppressHydrationWarning
+                  value={activeBrandId}
+                  onChange={(event) =>
+                    updateQueryParams(
+                      { brandId: event.target.value || null },
+                      { resetPage: true },
+                    )
+                  }
+                  className="h-11 rounded-2xl border border-red-100 bg-white px-4 text-sm outline-none transition focus:border-red-400 dark:border-red-800 dark:bg-red-950 dark:text-white"
+                >
+                  <option value="">Tất cả thương hiệu</option>
+                  {brands.map((brand) => (
+                    <option key={brand.id} value={brand.id}>
+                      {brand.name} ({brand.productsCount})
+                    </option>
+                  ))}
+                </select>
+              </label>
 
-            <label className="mt-4 flex flex-col gap-2 text-sm font-medium text-zinc-700 dark:text-zinc-200">
-              Thương hiệu
-              <select
-                value={activeBrandId}
-                onChange={(event) =>
-                  resetPageAndSet(setActiveBrandId, event.target.value)
-                }
-                className="h-11 rounded-2xl border border-red-100 bg-white px-4 text-sm outline-none transition focus:border-red-400 dark:border-red-800 dark:bg-red-950 dark:text-white"
-              >
-                <option value="">Tất cả thương hiệu</option>
-                {brands.map((brand) => (
-                  <option key={brand.id} value={brand.id}>
-                    {brand.name} ({brand.productsCount})
-                  </option>
-                ))}
-              </select>
-            </label>
+              <label className="mt-4 flex flex-col gap-2 text-sm font-medium text-zinc-700 dark:text-zinc-200">
+                Tag
+                <select
+                  suppressHydrationWarning
+                  value={activeTagId}
+                  onChange={(event) =>
+                    updateQueryParams(
+                      { tagId: event.target.value || null },
+                      { resetPage: true },
+                    )
+                  }
+                  className="h-11 rounded-2xl border border-red-100 bg-white px-4 text-sm outline-none transition focus:border-red-400 dark:border-red-800 dark:bg-red-950 dark:text-white"
+                >
+                  <option value="">Tất cả tag</option>
+                  {tags.map((tag) => (
+                    <option key={tag.id} value={tag.id}>
+                      {tag.name} ({tag.productsCount})
+                    </option>
+                  ))}
+                </select>
+              </label>
 
-            <label className="mt-4 flex flex-col gap-2 text-sm font-medium text-zinc-700 dark:text-zinc-200">
-              Tag
-              <select
-                value={activeTagId}
-                onChange={(event) =>
-                  resetPageAndSet(setActiveTagId, event.target.value)
-                }
-                className="h-11 rounded-2xl border border-red-100 bg-white px-4 text-sm outline-none transition focus:border-red-400 dark:border-red-800 dark:bg-red-950 dark:text-white"
-              >
-                <option value="">Tất cả tag</option>
-                {tags.map((tag) => (
-                  <option key={tag.id} value={tag.id}>
-                    {tag.name} ({tag.productsCount})
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            {hasActiveFilters ? (
-              <Button
-                type="button"
-                onClick={clearFilters}
-                className="mt-5 w-full border-red-600 bg-red-600 text-white hover:bg-red-700 dark:border-red-500 dark:bg-red-500 dark:hover:bg-red-400"
-              >
-                Xóa bộ lọc
-              </Button>
-            ) : null}
+              {hasActiveFilters ? (
+                <Button
+                  type="button"
+                  onClick={clearFilters}
+                  variant="primary"
+                  className="mt-5 w-full"
+                >
+                  Xóa bộ lọc
+                </Button>
+              ) : null}
+            </div>
           </motion.aside>
 
           <motion.div variants={fadeUpVariants}>
@@ -267,6 +464,22 @@ export default function ProductsPage() {
                 <p className="text-sm font-semibold text-zinc-950 dark:text-white">
                   {isLoading ? "Đang tải sản phẩm..." : `${total} sản phẩm`}
                 </p>
+                {selectedFilters.length > 0 ? (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {selectedFilters.map((filter) => (
+                      <button
+                        suppressHydrationWarning
+                        key={filter.key}
+                        type="button"
+                        onClick={filter.clear}
+                        className="inline-flex items-center gap-1 rounded-full border border-red-100 bg-red-50 px-3 py-1 text-xs font-semibold text-red-700 transition hover:bg-red-100 dark:border-red-800 dark:bg-red-950/70 dark:text-red-200 dark:hover:bg-red-900/70"
+                      >
+                        {filter.label}
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    ))}
+                  </div>
+                ) : null}
               </div>
               <p className="text-sm font-medium text-red-700 dark:text-red-200">
                 Trang {page}/{totalPages}
@@ -281,12 +494,7 @@ export default function ProductsPage() {
               className="mt-5 grid grid-cols-2 gap-3 sm:mt-6 sm:gap-5 md:grid-cols-2 xl:grid-cols-3"
             >
               {isLoading ? (
-                <motion.div
-                  variants={fadeUpVariants}
-                  className="col-span-full rounded-3xl border border-red-100 bg-red-50/90 p-6 text-center text-zinc-700 shadow-lg shadow-red-950/5 dark:border-red-700 dark:bg-red-950/70 dark:text-zinc-200 sm:rounded-4xl sm:p-8"
-                >
-                  Đang tải sản phẩm...
-                </motion.div>
+                <ProductGridSkeleton />
               ) : error ? (
                 <motion.div
                   variants={fadeUpVariants}
@@ -299,7 +507,27 @@ export default function ProductsPage() {
                   variants={fadeUpVariants}
                   className="col-span-full rounded-3xl border border-red-100 bg-red-50/90 p-6 text-center text-zinc-700 shadow-lg shadow-red-950/5 dark:border-red-700 dark:bg-red-950/70 dark:text-zinc-200 sm:rounded-4xl sm:p-8"
                 >
-                  Không có sản phẩm phù hợp với bộ lọc hiện tại.
+                  <p className="text-base font-semibold text-zinc-950 dark:text-white">
+                    Không có sản phẩm phù hợp với bộ lọc hiện tại.
+                  </p>
+                  <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-zinc-600 dark:text-zinc-300">
+                    Hãy thử bỏ bớt điều kiện lọc hoặc gửi yêu cầu tư vấn để
+                    Hoàng Long tìm đúng mã hàng cho bạn.
+                  </p>
+                  <div className="mt-5 flex flex-col justify-center gap-3 sm:flex-row">
+                    {hasActiveFilters ? (
+                      <Button
+                        type="button"
+                        variant="primary"
+                        onClick={clearFilters}
+                      >
+                        Xóa bộ lọc
+                      </Button>
+                    ) : null}
+                    <ButtonLink href="/#tu-van" variant="neutral">
+                      Liên hệ tư vấn
+                    </ButtonLink>
+                  </div>
                 </motion.div>
               ) : (
                 products.map((product) => (
@@ -321,7 +549,7 @@ export default function ProductsPage() {
                   variant="neutral"
                   disabled={!hasPreviousPage || isLoading}
                   onClick={() =>
-                    setPage((currentPage) => Math.max(1, currentPage - 1))
+                    updateQueryParams({ page: page - 1 <= 1 ? null : page - 1 })
                   }
                   className="w-full lg:w-auto"
                 >
@@ -357,7 +585,11 @@ export default function ProductsPage() {
                             pageNumber === page ? "page" : undefined
                           }
                           disabled={isLoading}
-                          onClick={() => setPage(pageNumber)}
+                          onClick={() =>
+                            updateQueryParams({
+                              page: pageNumber === 1 ? null : pageNumber,
+                            })
+                          }
                           className={`h-10 min-w-10 px-4 ${
                             pageNumber === page
                               ? "border-red-600 bg-red-600 text-white hover:bg-red-700 dark:border-red-500 dark:bg-red-500 dark:text-white dark:hover:bg-red-400"
@@ -386,7 +618,7 @@ export default function ProductsPage() {
                   type="button"
                   variant="neutral"
                   disabled={!hasNextPage || isLoading}
-                  onClick={() => setPage((currentPage) => currentPage + 1)}
+                  onClick={() => updateQueryParams({ page: page + 1 })}
                   className="w-full lg:w-auto"
                 >
                   Trang sau
@@ -397,5 +629,13 @@ export default function ProductsPage() {
         </div>
       </motion.section>
     </motion.div>
+  );
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={<ProductsPageFallback />}>
+      <ProductsPageContent />
+    </Suspense>
   );
 }

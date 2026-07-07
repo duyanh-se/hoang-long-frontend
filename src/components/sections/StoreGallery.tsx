@@ -69,7 +69,7 @@ export default function StoreGallery() {
   return (
     <div className="rounded-4xl border border-red-100 bg-white/80 p-0 shadow-lg shadow-red-950/5 backdrop-blur dark:border-red-800 dark:bg-red-950/50 sm:p-0">
       <div className="relative overflow-hidden rounded-4xl border border-red-100 bg-red-50/70 shadow-sm dark:border-red-800 dark:bg-red-950/60">
-        <div className="relative aspect-[4/3] overflow-hidden sm:aspect-[16/9]">
+        <div className="relative aspect-4/3 overflow-hidden sm:aspect-video">
           <Image
             src={image.src}
             alt={image.title}
@@ -78,7 +78,7 @@ export default function StoreGallery() {
             sizes="100vw"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/0 to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/0 to-transparent" />
           <div className="absolute inset-x-0 bottom-0 px-4 pb-4 pt-4 text-white sm:px-6 sm:pb-6">
             <h3 className="text-xl font-semibold tracking-tight sm:text-2xl">
               {image.title}
@@ -91,6 +91,7 @@ export default function StoreGallery() {
 
         <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center px-2 sm:px-4">
           <button
+            suppressHydrationWarning
             type="button"
             onClick={goToPrevious}
             className="pointer-events-auto rounded-full border border-white/20 bg-black/30 p-2.5 text-white transition hover:bg-black/50 sm:p-3"
@@ -101,6 +102,7 @@ export default function StoreGallery() {
         </div>
         <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 sm:px-4">
           <button
+            suppressHydrationWarning
             type="button"
             onClick={goToNext}
             className="pointer-events-auto rounded-full border border-white/20 bg-black/30 p-2.5 text-white transition hover:bg-black/50 sm:p-3"
@@ -114,6 +116,7 @@ export default function StoreGallery() {
       <div className="mt-4 flex flex-wrap items-center justify-center gap-2 px-4 py-4">
         {storeImages.map((imageOption, index) => (
           <button
+            suppressHydrationWarning
             key={imageOption.title}
             type="button"
             onClick={() => setActiveIndex(index)}
