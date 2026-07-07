@@ -47,6 +47,8 @@ export default function Header() {
   const [themeInitialized, setThemeInitialized] = useState(false);
   const [headerHidden, setHeaderHidden] = useState(false);
   const lastScrollYRef = useRef(0);
+  const cartScrollRef = useRef<HTMLDivElement | null>(null);
+  const checkoutFormRef = useRef<HTMLFormElement | null>(null);
   const cartItems = useCartStore((state) => state.items);
   const increaseCartItem = useCartStore((state) => state.increaseItem);
   const decreaseCartItem = useCartStore((state) => state.decreaseItem);
@@ -177,6 +179,21 @@ export default function Header() {
     };
   }, [openCartDrawer]);
 
+  useEffect(() => {
+    if (!checkoutVisible) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      checkoutFormRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 80);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [checkoutVisible]);
+
   const handleCheckoutSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -274,7 +291,10 @@ export default function Header() {
           </Button>
         </div>
 
-        <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-4 sm:p-5">
+        <div
+          ref={cartScrollRef}
+          className="flex flex-col gap-4 p-4 pb-[calc(1.5rem+env(safe-area-inset-bottom))] sm:p-5"
+        >
           {visibleCartItems.length === 0 ? (
             <div className="rounded-3xl border border-dashed border-(--brand-border) bg-(--brand-cream) p-5 text-sm text-zinc-600 dark:border-red-800 dark:bg-white/5 dark:text-zinc-300">
               Giỏ hàng đang trống. Hãy thêm sản phẩm từ trang chi tiết.
@@ -451,6 +471,7 @@ export default function Header() {
           <AnimatePresence initial={false}>
             {checkoutVisible && visibleCartItems.length > 0 ? (
               <motion.form
+                ref={checkoutFormRef}
                 key="checkout-form"
                 initial={{ opacity: 0, height: 0, y: 16 }}
                 animate={{ opacity: 1, height: "auto", y: 0 }}

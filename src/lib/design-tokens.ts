@@ -119,9 +119,9 @@ export const themeClassNames = {
   },
   cart: {
     drawer:
-      "absolute right-0 top-0 flex h-dvh w-full max-w-[min(100vw,28rem)] flex-col border-l border-(--brand-border) bg-(--surface) shadow-2xl dark:border-red-900 dark:bg-(--surface)",
+      "absolute right-0 top-0 flex h-dvh max-h-dvh w-full max-w-[min(100vw,28rem)] flex-col overflow-y-auto overscroll-contain scroll-smooth border-l border-(--brand-border) bg-(--surface) shadow-2xl dark:border-red-900 dark:bg-(--surface)",
     header:
-      "flex items-center justify-between border-b border-(--brand-border) bg-(--brand-cream)/80 px-4 py-3 dark:border-red-900 dark:bg-red-950/30 sm:px-5 sm:py-4",
+      "sticky top-0 z-10 flex items-center justify-between border-b border-(--brand-border) bg-(--brand-cream)/95 px-4 py-3 backdrop-blur dark:border-red-900 dark:bg-red-950/90 sm:px-5 sm:py-4",
     item: "rounded-3xl border border-(--brand-border) bg-(--surface) p-3 shadow-sm shadow-red-950/5 dark:border-red-800 dark:bg-red-950/70 sm:p-4",
     image:
       "relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl border border-(--brand-border) bg-(--brand-primary-soft) dark:border-red-800 dark:bg-red-950",
